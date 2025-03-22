@@ -96,7 +96,7 @@ void LoginPage::onLoginButtonClicked() {
     // Get the username and password from the input fields
     QString username = ui->usernameLineEdit->text();
     QString password = ui->passwordLineEdit->text();
-    if (username == "" && password == "")
+    if (username == "" || password == "")
     {
         QMessageBox::information(this, "Error", "Fields is empty");
     }
@@ -113,16 +113,11 @@ void LoginPage::onLoginButtonClicked() {
 void LoginPage::onSignupbuttonClicked(){
     QString username = ui->usernameLineEdit->text();
     QString password = ui->passwordLineEdit->text();
-    if (username == "" && password == "")
+    if (username == "" || password == "")
     {
         QMessageBox::information(this, "Error", "Fields is empty");
     }
     else {
-        if (password == "")
-        {
-            QMessageBox::information(this, "Error", "password is empty");
-        }
-        else {
         if (checkIfUserExist(username)){
             QMessageBox::information(this, "signup failed", "the account already exist");
         }
@@ -130,7 +125,5 @@ void LoginPage::onSignupbuttonClicked(){
             adduser(username, password);
             QMessageBox::information(this, "signup done", "the account is made scsuessfully");
         }
-        }
-
     }
 }
