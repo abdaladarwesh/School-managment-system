@@ -19,8 +19,6 @@ LoginPage::LoginPage(QWidget *parent) : QWidget(parent), ui(new Ui::LoginPage) {
     }
     connect(ui->signupbutton, &QPushButton::clicked, this, &LoginPage::onSignupbuttonClicked);
     connect(ui->loginButton, &QPushButton::clicked, this, &LoginPage::onLoginButtonClicked);
-    connect(ui->teacher, &QRadioButton::clicked, this, &LoginPage::checkButtonState);
-    connect(ui->student, &QRadioButton::clicked, this, &LoginPage::checkButtonState);
 }
 
 LoginPage::~LoginPage() {
@@ -39,6 +37,7 @@ bool LoginPage::connectToDatabase() {
 
     if (!db.open()) {
         qDebug() << "Database connection failed:" << db.lastError().text();
+        QMessageBox::warning(this, "Data base", "an error happend during the connection to database");
         return false;
     }
 
@@ -46,50 +45,51 @@ bool LoginPage::connectToDatabase() {
     return true;
 }
 
-bool LoginPage::validateCredentials(const QString &username, const QString &password) {
-    QString accountType = checkButtonState();
+QString LoginPage::validateCredentials(const QString &username) {
     QSqlQuery query;
-    query.prepare("select * from " + accountType + "s where username = :username AND password = :password");
+    query.prepare("SELECT role FROM users WHERE username = :username");
     query.bindValue(":username", username);
-    query.bindValue(":password", password);
 
     if (!query.exec()) {
         qDebug() << "Query failed:" << query.lastError().text();
-        return false;
+        return ""; // Return empty string on failure
     }
 
-    // Check if a matching record was found
-    return query.next();
+    // If a matching record is found, return the role
+    if (query.next()) {
+        return query.value(0).toString(); // Get the role from the query result
+    }
+
+    return ""; // Return empty string if no user found
 }
 void LoginPage::onLoginButtonClicked() {
     // Get the username and password from the input fields
     QString username = ui->usernameLineEdit->text();
     QString password = ui->passwordLineEdit->text();
-    if (username.isEmpty() || password.isEmpty() || checkButtonState() == "none")
+    if (username.isEmpty() || password.isEmpty())
     {
         QMessageBox::information(this, "Error", "Fields is empty");
     }
     else{
-        if (checkButtonState() == "teacher"){
-            if (validateCredentials(username, password)) {
+        QString role = validateCredentials(username);
+            if (role != "") {
+            if (role == "teacher"){
                 QMessageBox::information(this, "Success", "Login successful!");
                 teacher *teacherWindow = new teacher();
                 teacherWindow->show();
-            } else {
+            }
+            else if (role == "student"){
+                QMessageBox::information(this, "Success", "Login successful!");
+                student *studentWindow = new student();
+                studentWindow->show();
+            }
+            else if (role == "admin"){
+                QMessageBox::information(this, "Success", "Login successful! ADMIN !!");
+            }
+            else {
                 QMessageBox::warning(this, "Error", "Invalid username or password.");
             }
-        }
-        else if (checkButtonState() == "student"){
-                if (validateCredentials(username, password)) {
-                    QMessageBox::information(this, "Success", "Login successful!");
-                    student *studentWindow = new student();
-                    studentWindow->show();
-                } else {
-                    QMessageBox::warning(this, "Error", "Invalid username or password.");
-                }
-        }
-        // Validate the credentials
-
+            }
     }
 }
 void LoginPage::onSignupbuttonClicked(){
@@ -98,18 +98,5 @@ void LoginPage::onSignupbuttonClicked(){
     // Show the Signup window
     signupWindow->show();
 }
-
-QString LoginPage::checkButtonState() {
-    if (ui->teacher->isChecked()) {
-        qDebug() << "t";
-        return "teacher";
-    } else if (ui->student->isChecked()) {
-        qDebug() << "s";
-        return "student";
-    } else {
-        return "none";
-    }
-}
-
 
 

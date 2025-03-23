@@ -22,7 +22,6 @@ public:
 private slots:
     void onLoginButtonClicked();
     void onSignupbuttonClicked();
-    QString checkButtonState();
 
 
 private:
@@ -30,7 +29,7 @@ private:
     QSqlDatabase db;
 
     bool connectToDatabase();
-    bool validateCredentials(const QString &username, const QString &password);
+    QString validateCredentials(const QString &username);
 };
 
 #endif // LOGINPAGE_H

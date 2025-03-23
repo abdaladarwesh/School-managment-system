@@ -40,34 +40,15 @@ bool signup::connectToDatabase() {
     return true;
 }
 
-bool signup::validateCredentials(const QString &username, const QString &password) {
-    QString accountType = checkButtonState();
-    if (accountType == "none") {
-        QMessageBox::information(this, "Error", "Please select an account type");
-        return false;
-    }
-
-    QSqlQuery query;
-    query.prepare("SELECT * FROM " + accountType + "s WHERE username = :username AND password = :password");
-    query.bindValue(":username", username);
-    query.bindValue(":password", password);
-
-    if (!query.exec()) {
-        qDebug() << "Query failed:" << query.lastError().text();
-        return false;
-    }
-    return query.next();
-}
-
 bool signup::checkIfUserExist(const QString &username) {
     QString accountType = checkButtonState();
     if (accountType == "none") {
-        QMessageBox::information(this, "Error", "Please select an account type");
+        QMessageBox::warning(this, "Error", "Please select an account type");
         return false;
     }
 
     QSqlQuery query;
-    query.prepare("SELECT * FROM " + accountType + "s WHERE username = :username");
+    query.prepare("SELECT * FROM users WHERE username = :username AND role = " + accountType);
     query.bindValue(":username", username);
 
     if (!query.exec()) {
@@ -80,15 +61,16 @@ bool signup::checkIfUserExist(const QString &username) {
 void signup::adduser(const QString &username, const QString &password) {
     QString accountType = checkButtonState();
     if (accountType == "none") {
-        QMessageBox::information(this, "Error", "Please select an account type");
+        QMessageBox::warning(this, "Error", "Please select an account type");
         return;
     }
 
     QSqlQuery query;
     QSqlDatabase::database().transaction();
-    query.prepare("INSERT INTO " + accountType + "s (username, password) VALUES (:username, :password)");
+    query.prepare("INSERT INTO users (username, password, role) VALUES (:username, :password,:role)");
     query.bindValue(":username", username);
     query.bindValue(":password", password);
+    query.bindValue(":role", accountType);
 
     if (query.exec()) {
         QSqlDatabase::database().commit();
@@ -114,12 +96,12 @@ void signup::onSignupbuttonClicked() {
     QString password = ui->passwordLineEdit->text();
 
     if (username.isEmpty() || password.isEmpty() || checkButtonState() == "none") {
-        QMessageBox::information(this, "Error", "Fields cannot be empty");
+        QMessageBox::warning(this, "Error", "Fields cannot be empty");
         return;
     }
 
     if (checkIfUserExist(username)) {
-        QMessageBox::information(this, "Signup Failed", "The account already exists");
+        QMessageBox::warning(this, "Signup Failed", "The account already exists");
     } else {
         adduser(username, password);
         QMessageBox::information(this, "Signup Successful", "The account was created successfully");
