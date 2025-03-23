@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <QSqlDatabase>
 #include "signup.h"
+#include <QString>
+#include "teacher.h"
+#include "student.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LoginPage; }
@@ -19,6 +22,8 @@ public:
 private slots:
     void onLoginButtonClicked();
     void onSignupbuttonClicked();
+    QString checkButtonState();
+
 
 private:
     Ui::LoginPage *ui;
@@ -26,8 +31,6 @@ private:
 
     bool connectToDatabase();
     bool validateCredentials(const QString &username, const QString &password);
-    void adduser(const QString &username, const QString &password);
-    bool checkIfUserExist(const QString &username);
 };
 
 #endif // LOGINPAGE_H

@@ -11,8 +11,10 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -24,6 +26,9 @@ public:
     QVBoxLayout *verticalLayout;
     QLineEdit *usernameLineEdit;
     QLineEdit *passwordLineEdit;
+    QHBoxLayout *horizontalLayout;
+    QRadioButton *teacher;
+    QRadioButton *student;
     QPushButton *signupbutton;
     QPushButton *loginButton;
 
@@ -45,6 +50,21 @@ public:
 
         verticalLayout->addWidget(passwordLineEdit);
 
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
+        teacher = new QRadioButton(LoginPage);
+        teacher->setObjectName("teacher");
+
+        horizontalLayout->addWidget(teacher);
+
+        student = new QRadioButton(LoginPage);
+        student->setObjectName("student");
+
+        horizontalLayout->addWidget(student);
+
+
+        verticalLayout->addLayout(horizontalLayout);
+
         signupbutton = new QPushButton(LoginPage);
         signupbutton->setObjectName("signupbutton");
 
@@ -65,6 +85,8 @@ public:
     {
         usernameLineEdit->setPlaceholderText(QCoreApplication::translate("LoginPage", "Username", nullptr));
         passwordLineEdit->setPlaceholderText(QCoreApplication::translate("LoginPage", "Password", nullptr));
+        teacher->setText(QCoreApplication::translate("LoginPage", "Teacher", nullptr));
+        student->setText(QCoreApplication::translate("LoginPage", "Student", nullptr));
         signupbutton->setText(QCoreApplication::translate("LoginPage", "Sign up", nullptr));
         loginButton->setText(QCoreApplication::translate("LoginPage", "Login", nullptr));
         (void)LoginPage;

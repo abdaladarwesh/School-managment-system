@@ -22,6 +22,8 @@ qt_add_executable(untitled MANUAL_FINALIZATION ${PROJECT_SOURCES}
   loginpage.h
   loginpage.cpp
   signup.h signup.cpp signup.ui
+  teacher.h teacher.cpp teacher.ui
+  student.h student.cpp student.ui
 )
 
 target_link_libraries(untitled PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)
