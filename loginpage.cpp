@@ -1,9 +1,11 @@
 #include "loginpage.h"
 #include "ui_loginpage.h"
+#include "signup.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 #include <QMessageBox>
+#include <QRadioButton>
 
 LoginPage::LoginPage(QWidget *parent) : QWidget(parent), ui(new Ui::LoginPage) {
     ui->setupUi(this);
@@ -111,19 +113,27 @@ void LoginPage::onLoginButtonClicked() {
     }
 }
 void LoginPage::onSignupbuttonClicked(){
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
-    if (username == "" || password == "")
-    {
-        QMessageBox::information(this, "Error", "Fields is empty");
-    }
-    else {
-        if (checkIfUserExist(username)){
-            QMessageBox::information(this, "signup failed", "the account already exist");
-        }
-        else{
-            adduser(username, password);
-            QMessageBox::information(this, "signup done", "the account is made scsuessfully");
-        }
-    }
+    // Create an instance of the Signup window
+    signup *signupWindow = new signup();
+    // Show the Signup window
+    signupWindow->show();
 }
+
+
+
+    // QString username = ui->usernameLineEdit->text();
+    // QString password = ui->passwordLineEdit->text();
+    // if (username == "" || password == "")
+    // {
+    //     QMessageBox::information(this, "Error", "Fields is empty");
+    // }
+    // else {
+    //     if (checkIfUserExist(username)){
+    //         QMessageBox::information(this, "signup failed", "the account already exist");
+    //     }
+    //     else{
+    //         adduser(username, password);
+    //         QMessageBox::information(this, "signup done", "the account is made scsuessfully");
+    //     }
+    // }
+

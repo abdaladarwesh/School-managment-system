@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
 qt_add_executable(untitled MANUAL_FINALIZATION ${PROJECT_SOURCES}
   loginpage.h
   loginpage.cpp
+  signup.h signup.cpp signup.ui
 )
 
 target_link_libraries(untitled PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)
