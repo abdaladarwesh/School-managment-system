@@ -1,0 +1,25 @@
+# ninja log v6
+2077	21350	7645252774416110	CMakeFiles/untitled.dir/main.cpp.obj	ec856c6abbf48f2b
+8	1088	7645265565102761	build.ninja	850f2a7156501efb
+2071	21353	7645252774350614	CMakeFiles/untitled.dir/untitled_autogen/mocs_compilation.cpp.obj	504ecd1a802f9260
+61	732	7645264878403605	untitled_autogen/timestamp	450d9e58284948fd
+61	732	7645264878403605	untitled_autogen/mocs_compilation.cpp	450d9e58284948fd
+734	10769	7645264885127355	CMakeFiles/untitled.dir/loginpage.cpp.obj	371257938cb7d8b7
+61	732	7645264878403605	P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/timestamp	450d9e58284948fd
+741	10863	7645264885203398	CMakeFiles/untitled.dir/signup.cpp.obj	cee34a9cf5ea82af
+61	732	7645264878403605	P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/mocs_compilation.cpp	450d9e58284948fd
+10863	13081	7645264986414846	untitled.exe	49423d5f96388155
+748	10180	7645264885268933	CMakeFiles/untitled.dir/teacher.cpp.obj	4b6c9a29e9d7163d
+755	10232	7645264885344926	CMakeFiles/untitled.dir/student.cpp.obj	ecbe89f47da860e7
+762	10483	7645264885409437	CMakeFiles/untitled.dir/login.cpp.obj	5b2aba2493f23657
+47	339	7645265783748245	untitled_autogen/timestamp	450d9e58284948fd
+47	339	7645265783748245	untitled_autogen/mocs_compilation.cpp	450d9e58284948fd
+47	339	7645265783748245	P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/timestamp	450d9e58284948fd
+47	339	7645265783748245	P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/mocs_compilation.cpp	450d9e58284948fd
+367	12223	7645265785417833	CMakeFiles/untitled.dir/teacher.cpp.obj	4b6c9a29e9d7163d
+886	12231	7645265790594622	CMakeFiles/untitled.dir/student.cpp.obj	ecbe89f47da860e7
+342	12249	7645265785155776	CMakeFiles/untitled.dir/untitled_autogen/mocs_compilation.cpp.obj	504ecd1a802f9260
+349	12284	7645265785231388	CMakeFiles/untitled.dir/main.cpp.obj	ec856c6abbf48f2b
+355	12344	7645265785291892	CMakeFiles/untitled.dir/loginpage.cpp.obj	371257938cb7d8b7
+361	12351	7645265785351914	CMakeFiles/untitled.dir/signup.cpp.obj	cee34a9cf5ea82af
+12351	15586	7645265905255060	untitled.exe	b82b66f169a68ab0
