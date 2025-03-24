@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>E:/2755436.jpg</file>
+        <file>E:/wedit.png</file>
+        <file>E:/istockphoto-1265965042-612x612.jpg</file>
+        <file>E:/download.png</file>
+    </qresource>
+</RCC>
