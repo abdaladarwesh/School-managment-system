@@ -1328,9 +1328,58 @@
 			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Sql/Qt6SqlVersionlessAliasTargets.cmake"
 		},
 		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfigVersion.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfigVersionImpl.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfig.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsDependencies.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsTargets-relwithdebinfo.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsAdditionalTargetInfo.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsVersionlessTargets.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeParseArguments.cmake"
+		},
+		{
 			"isCMake" : true,
 			"isExternal" : true,
 			"path" : "E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake"
+		},
+		{
+			"path" : "images.qrc"
 		}
 	],
 	"kind" : "cmakeFiles",

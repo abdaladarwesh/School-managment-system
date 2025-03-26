@@ -1,35 +1,36 @@
-#ifndef LOGINPAGE_H
-#define LOGINPAGE_H
+#ifndef SIGN_IN_H
+#define SIGN_IN_H
 
 #include <QWidget>
+#include <QWidget>
 #include <QSqlDatabase>
-#include "signup.h"
 #include <QString>
 #include "teacher.h"
 #include "student.h"
 
+
 QT_BEGIN_NAMESPACE
-namespace Ui { class LoginPage; }
+namespace Ui { class sign_in; }
 QT_END_NAMESPACE
 
-class LoginPage : public QWidget {
+class sign_in : public QWidget
+{
     Q_OBJECT
 
 public:
-    explicit LoginPage(QWidget *parent = nullptr);
-    ~LoginPage();
-
+    explicit sign_in(QWidget *parent = nullptr);
+    ~sign_in();
 private slots:
     void onLoginButtonClicked();
     void onSignupbuttonClicked();
 
-
 private:
-    Ui::LoginPage *ui;
+    Ui::sign_in *ui;
     QSqlDatabase db;
 
     bool connectToDatabase();
-    QString validateCredentials(const QString &username);
+    QString validateCredentials(const QString &username,const QString &password);
+
 };
 
-#endif // LOGINPAGE_H
+#endif // SIGN_IN_H

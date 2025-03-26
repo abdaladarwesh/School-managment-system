@@ -321,7 +321,19 @@
 		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginTargets-relwithdebinfo.cmake",
 		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginAdditionalTargetInfo.cmake",
 		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Sql/Qt6SqlVersionlessAliasTargets.cmake",
-		"E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake"
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfigVersion.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfigVersionImpl.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfig.cmake",
+		"E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsDependencies.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsTargets.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsTargets-relwithdebinfo.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsAdditionalTargetInfo.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsVersionlessTargets.cmake",
+		"E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake",
+		"E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeParseArguments.cmake",
+		"E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake",
+		"P:/coding/loginform/loginform/images.qrc"
 	],
 	"CMAKE_SOURCE_DIR" : "P:/coding/loginform/loginform",
 	"CROSS_CONFIG" : false,
@@ -330,15 +342,15 @@
 	"HEADERS" : 
 	[
 		[
-			"P:/coding/loginform/loginform/loginpage.h",
+			"P:/coding/loginform/loginform/sign_in.h",
 			"MU",
-			"EWIEGA46WW/moc_loginpage.cpp",
+			"EWIEGA46WW/moc_sign_in.cpp",
 			null
 		],
 		[
-			"P:/coding/loginform/loginform/signup.h",
+			"P:/coding/loginform/loginform/signup_page.h",
 			"MU",
-			"EWIEGA46WW/moc_signup.cpp",
+			"EWIEGA46WW/moc_signup_page.cpp",
 			null
 		],
 		[
@@ -427,9 +439,9 @@
 	"SETTINGS_FILE" : "P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/untitled_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "P:/coding/loginform/loginform/loginpage.cpp", "MU", null ],
 		[ "P:/coding/loginform/loginform/main.cpp", "MU", null ],
-		[ "P:/coding/loginform/loginform/signup.cpp", "MU", null ],
+		[ "P:/coding/loginform/loginform/sign_in.cpp", "MU", null ],
+		[ "P:/coding/loginform/loginform/signup_page.cpp", "MU", null ],
 		[ "P:/coding/loginform/loginform/student.cpp", "MU", null ],
 		[ "P:/coding/loginform/loginform/teacher.cpp", "MU", null ]
 	],

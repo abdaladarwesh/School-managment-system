@@ -1,31 +1,34 @@
-#include "loginpage.h"
-#include "ui_loginpage.h"
-#include "signup.h"
+#include "sign_in.h"
+#include "ui_sign_in.h"
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 #include <QMessageBox>
-#include <QRadioButton>
-#include "teacher.h"
+#include "signup_page.h"
 #include "student.h"
+#include "teacher.h"
 
-LoginPage::LoginPage(QWidget *parent) : QWidget(parent), ui(new Ui::LoginPage) {
+sign_in::sign_in(QWidget *parent): QWidget(parent), ui(new Ui::sign_in)
+{
     ui->setupUi(this);
-
-    // Set up the database connection
     if (!connectToDatabase()) {
         QMessageBox::critical(this, "Error", "Failed to connect to the database.");
         return;
     }
-    connect(ui->signupbutton, &QPushButton::clicked, this, &LoginPage::onSignupbuttonClicked);
-    connect(ui->loginButton, &QPushButton::clicked, this, &LoginPage::onLoginButtonClicked);
+    connect(ui->loginButton, &QPushButton::clicked, this, &sign_in::onLoginButtonClicked);
+    connect(ui->signupbutton, &QPushButton::clicked, this, &sign_in::onSignupbuttonClicked);
+
 }
 
-LoginPage::~LoginPage() {
+
+
+
+sign_in::~sign_in()
+{
     delete ui;
 }
 
-bool LoginPage::connectToDatabase() {
+bool sign_in::connectToDatabase() {
     // Set up the Oracle database connection
     db = QSqlDatabase::addDatabase("QODBC");
     QString connectionString =
@@ -45,24 +48,45 @@ bool LoginPage::connectToDatabase() {
     return true;
 }
 
-QString LoginPage::validateCredentials(const QString &username) {
+QString sign_in::validateCredentials(const QString &username, const QString &password) {
     QSqlQuery query;
-    query.prepare("SELECT role FROM users WHERE username = :username");
+    query.prepare("select user_id from users where username = :username and password = :password");
     query.bindValue(":username", username);
+    query.bindValue(":password", password);
 
     if (!query.exec()) {
-        qDebug() << "Query failed:" << query.lastError().text();
+        qDebug() << "User Query failed:\n" << query.lastError().text();
         return ""; // Return empty string on failure
     }
 
     // If a matching record is found, return the role
     if (query.next()) {
-        return query.value(0).toString(); // Get the role from the query result
+        int user_id = query.value(0).toInt();
+        query.prepare("select * from teachers where user_id = :user_id");
+        query.bindValue(":user_id", user_id);
+        if (!query.exec()) {
+            qDebug() << "Teacher Query failed:" << query.lastError().text();
+            return ""; // Return empty string on failure
+        }
+        if (query.next()){
+            return "teacher";
+        }
+        else {
+            query.prepare("select * from students where user_id = :user_id");
+            query.bindValue(":user_id", user_id);
+            if (!query.exec()) {
+                qDebug() << "Student Query failed:" << query.lastError().text();
+                return ""; // Return empty string on failure
+            }
+            if(query.next()){
+                return "student";
+            }
+        }
     }
-
     return ""; // Return empty string if no user found
 }
-void LoginPage::onLoginButtonClicked() {
+
+void sign_in::onLoginButtonClicked() {
     // Get the username and password from the input fields
     QString username = ui->usernameLineEdit->text();
     QString password = ui->passwordLineEdit->text();
@@ -71,17 +95,19 @@ void LoginPage::onLoginButtonClicked() {
         QMessageBox::information(this, "Error", "Fields is empty");
     }
     else{
-        QString role = validateCredentials(username);
-            if (role != "") {
+        QString role = validateCredentials(username, password);
+        if (role != "") {
             if (role == "teacher"){
                 QMessageBox::information(this, "Success", "Login successful!");
                 teacher *teacherWindow = new teacher();
                 teacherWindow->show();
+                this->close();
             }
             else if (role == "student"){
                 QMessageBox::information(this, "Success", "Login successful!");
                 student *studentWindow = new student();
                 studentWindow->show();
+                this->close();
             }
             else if (role == "admin"){
                 QMessageBox::information(this, "Success", "Login successful! ADMIN !!");
@@ -89,14 +115,20 @@ void LoginPage::onLoginButtonClicked() {
             else {
                 QMessageBox::warning(this, "Error", "Invalid username or password.");
             }
-            }
+        }
     }
 }
-void LoginPage::onSignupbuttonClicked(){
+
+void sign_in::onSignupbuttonClicked(){
     // Create an instance of the Signup window
-    signup *signupWindow = new signup();
+    signup_page *signupWindow = new signup_page();
     // Show the Signup window
     signupWindow->show();
+    this->close();
 }
+
+
+
+
 
 

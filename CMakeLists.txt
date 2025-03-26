@@ -9,22 +9,25 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql LinguistTools)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql LinguistTools)
+set(TS_FILES untitled_en_US.ts)
 
 set(PROJECT_SOURCES
-
     main.cpp
-    loginpage.ui
+
+    ${TS_FILES}
 )
 
 qt_add_executable(untitled MANUAL_FINALIZATION ${PROJECT_SOURCES}
-  loginpage.h
-  loginpage.cpp
-  signup.h signup.cpp signup.ui
+
+
+
   teacher.h teacher.cpp teacher.ui
   student.h student.cpp student.ui
-
+  sign_in.h sign_in.cpp sign_in.ui
+  signup_page.cpp signup_page.h signup_page.ui
+  images.qrc
 )
 
 target_link_libraries(untitled PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)
@@ -52,3 +55,10 @@ install(TARGETS untitled
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(untitled)
 endif()
+
+
+
+
+
+
+

@@ -278,6 +278,15 @@ untitled_autogen/timestamp: \
 	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6GuiTools/Qt6GuiToolsTargets-relwithdebinfo.cmake \
 	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6GuiTools/Qt6GuiToolsTargets.cmake \
 	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6GuiTools/Qt6GuiToolsVersionlessTargets.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsAdditionalTargetInfo.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfig.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfigVersion.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsConfigVersionImpl.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsDependencies.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsTargets-relwithdebinfo.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsTargets.cmake \
+	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools/Qt6LinguistToolsVersionlessTargets.cmake \
 	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPluginAdditionalTargetInfo.cmake \
 	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPluginConfig.cmake \
 	E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPluginTargets-relwithdebinfo.cmake \
@@ -338,6 +347,7 @@ untitled_autogen/timestamp: \
 	E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeGenericSystem.cmake \
 	E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake \
 	E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeLanguageInformation.cmake \
+	E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeParseArguments.cmake \
 	E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeRCInformation.cmake \
 	E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake \
 	E:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake \
@@ -575,17 +585,18 @@ untitled_autogen/timestamp: \
 	P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake \
 	P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeSystem.cmake \
 	P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/moc_predefs.h \
-	P:/coding/loginform/loginform/loginpage.cpp \
-	P:/coding/loginform/loginform/loginpage.h \
+	P:/coding/loginform/loginform/images.qrc \
 	P:/coding/loginform/loginform/main.cpp \
-	P:/coding/loginform/loginform/signup.cpp \
-	P:/coding/loginform/loginform/signup.h \
+	P:/coding/loginform/loginform/sign_in.cpp \
+	P:/coding/loginform/loginform/sign_in.h \
+	P:/coding/loginform/loginform/signup_page.cpp \
+	P:/coding/loginform/loginform/signup_page.h \
 	P:/coding/loginform/loginform/student.cpp \
 	P:/coding/loginform/loginform/student.h \
 	P:/coding/loginform/loginform/teacher.cpp \
 	P:/coding/loginform/loginform/teacher.h \
-	P:/coding/loginform/loginform/loginpage.ui \
-	P:/coding/loginform/loginform/signup.ui \
+	P:/coding/loginform/loginform/sign_in.ui \
+	P:/coding/loginform/loginform/signup_page.ui \
 	P:/coding/loginform/loginform/student.ui \
 	P:/coding/loginform/loginform/teacher.ui \
 	E:/Qt/Tools/CMake_64/bin/cmake.exe

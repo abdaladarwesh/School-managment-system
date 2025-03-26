@@ -1,30 +1,29 @@
-#ifndef SIGNUP_H
-#define SIGNUP_H
+#ifndef SIGNUP_PAGE_H
+#define SIGNUP_PAGE_H
 
+#include <QWidget>
 #include <QDialog>
 #include <QString>
 #include <QSqlDatabase>
 
-
 namespace Ui {
-class signup;
+class signup_page;
 }
 
-class signup : public QDialog
+class signup_page : public QWidget
 {
     Q_OBJECT
 
-public:
-    explicit signup(QWidget *parent = nullptr);
-    ~signup();
-
 private slots:
-    QString checkButtonState();
     void onSignupbuttonClicked();
 
 
+public:
+    explicit signup_page(QWidget *parent = nullptr);  // Ensure the class name matches
+    ~signup_page();
+
 private:
-    Ui::signup *ui;
+    Ui::signup_page *ui;
     QSqlDatabase db;
 
     bool connectToDatabase();
@@ -34,4 +33,4 @@ private:
 
 };
 
-#endif // SIGNUP_H
+#endif // SIGNUP_PAGE_H

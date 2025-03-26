@@ -767,7 +767,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "C:/Program Files (x86)/loginform"
+			"value" : "C:/Program Files (x86)/untitled"
 		},
 		{
 			"name" : "CMAKE_INSTALL_RUNSTATEDIR",
@@ -6246,6 +6246,18 @@
 			"value" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6Gui"
 		},
 		{
+			"name" : "Qt6LinguistTools_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for Qt6LinguistTools."
+				}
+			],
+			"type" : "PATH",
+			"value" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools"
+		},
+		{
 			"name" : "Qt6Sql_DIR",
 			"properties" : 
 			[
@@ -6403,43 +6415,19 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Program Files (x86)/loginform"
+			"value" : "C:/Program Files (x86)/untitled"
 		},
 		{
-			"name" : "loginform_BINARY_DIR",
+			"name" : "_Qt6_LINGUIST_TOOLS_DIR",
 			"properties" : 
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
+					"value" : ""
 				}
 			],
-			"type" : "STATIC",
-			"value" : "P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug"
-		},
-		{
-			"name" : "loginform_IS_TOP_LEVEL",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "ON"
-		},
-		{
-			"name" : "loginform_SOURCE_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "P:/coding/loginform/loginform"
+			"type" : "INTERNAL",
+			"value" : "E:/Qt/6.8.2/mingw_64/lib/cmake/Qt6LinguistTools"
 		},
 		{
 			"name" : "untitled_BINARY_DIR",

@@ -1,5 +1,6 @@
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/EWIEGA46WW/moc_login.cpp: P:/coding/loginform/loginform/login.h \
+P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/EWIEGA46WW/moc_sign_in.cpp: P:/coding/loginform/loginform/sign_in.h \
   P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled_autogen/moc_predefs.h \
+  E:/Qt/6.8.2/mingw_64/include/QtCore/QString \
   E:/Qt/6.8.2/mingw_64/include/QtCore/q20functional.h \
   E:/Qt/6.8.2/mingw_64/include/QtCore/q20iterator.h \
   E:/Qt/6.8.2/mingw_64/include/QtCore/q20memory.h \
@@ -57,6 +58,7 @@ P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled
   E:/Qt/6.8.2/mingw_64/include/QtCore/qmargins.h \
   E:/Qt/6.8.2/mingw_64/include/QtCore/qmath.h \
   E:/Qt/6.8.2/mingw_64/include/QtCore/qmetacontainer.h \
+  E:/Qt/6.8.2/mingw_64/include/QtCore/qmetaobject.h \
   E:/Qt/6.8.2/mingw_64/include/QtCore/qmetatype.h \
   E:/Qt/6.8.2/mingw_64/include/QtCore/qminmax.h \
   E:/Qt/6.8.2/mingw_64/include/QtCore/qnamespace.h \
@@ -145,7 +147,13 @@ P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled
   E:/Qt/6.8.2/mingw_64/include/QtGui/qtransform.h \
   E:/Qt/6.8.2/mingw_64/include/QtGui/qwindowdefs.h \
   E:/Qt/6.8.2/mingw_64/include/QtGui/qwindowdefs_win.h \
+  E:/Qt/6.8.2/mingw_64/include/QtSql/QSqlDatabase \
+  E:/Qt/6.8.2/mingw_64/include/QtSql/qsqldatabase.h \
+  E:/Qt/6.8.2/mingw_64/include/QtSql/qtsql-config.h \
+  E:/Qt/6.8.2/mingw_64/include/QtSql/qtsqlexports.h \
+  E:/Qt/6.8.2/mingw_64/include/QtSql/qtsqlglobal.h \
   E:/Qt/6.8.2/mingw_64/include/QtWidgets/QDialog \
+  E:/Qt/6.8.2/mingw_64/include/QtWidgets/QWidget \
   E:/Qt/6.8.2/mingw_64/include/QtWidgets/qdialog.h \
   E:/Qt/6.8.2/mingw_64/include/QtWidgets/qsizepolicy.h \
   E:/Qt/6.8.2/mingw_64/include/QtWidgets/qtwidgets-config.h \
@@ -357,4 +365,6 @@ P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/untitled
   E:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/sys/types.h \
   E:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
   E:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
-  E:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h
+  E:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
+  P:/coding/loginform/loginform/student.h \
+  P:/coding/loginform/loginform/teacher.h
