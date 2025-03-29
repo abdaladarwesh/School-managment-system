@@ -1,9 +1,0 @@
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/untitled.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/install.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/untitled_autogen_timestamp_deps.dir
-P:/coding/loginform/loginform/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/untitled_autogen.dir
