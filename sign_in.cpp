@@ -16,7 +16,6 @@ sign_in::sign_in(QWidget *parent): QWidget(parent), ui(new Ui::sign_in)
         return;
     }
     connect(ui->loginButton, &QPushButton::clicked, this, &sign_in::onLoginButtonClicked);
-    connect(ui->signupbutton, &QPushButton::clicked, this, &sign_in::onSignupbuttonClicked);
 
 }
 
@@ -88,8 +87,8 @@ QString sign_in::validateCredentials(const QString &username, const QString &pas
 
 void sign_in::onLoginButtonClicked() {
     // Get the username and password from the input fields
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
+    QString username = ui->usernameEdit->text();
+    QString password = ui->passwordEdit->text();
     if (username.isEmpty() || password.isEmpty())
     {
         QMessageBox::information(this, "Error", "Fields is empty");
