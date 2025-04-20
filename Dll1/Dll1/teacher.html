@@ -1,0 +1,786 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .sidebar-header h2 {
+            color: #e74c3c;
+        }
+        
+        .menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            color: #555;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .menu-item.active {
+            border-left: 4px solid #e74c3c;
+            background-color: #fdecea;
+            color: #e74c3c;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .user-info {
+            font-weight: bold;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat {
+            color: #555;
+            transition: color 0.3s;
+        }
+        
+        .stat span {
+            color: #e74c3c;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Dashboard Content */
+        .dashboard-content {
+            flex: 1;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-content: flex-start;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: white;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        
+        /* Grade Chart Container */
+        .grade-chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 20px;
+        }
+        
+        /* Average grade display */
+        .average-grade {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 15px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .average-grade-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .average-grade-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .class-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: border-color 0.3s;
+        }
+        
+        .class-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .class-name {
+            font-weight: bold;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        .class-details {
+            color: #777;
+            font-size: 14px;
+            margin-top: 5px;
+            transition: color 0.3s;
+        }
+        
+        .todo-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.3s, opacity 0.3s;
+        }
+        
+        .todo-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .todo-checkbox {
+            margin-right: 10px;
+        }
+        
+        .todo-text {
+            flex-grow: 1;
+        }
+        
+        .todo-title {
+            font-weight: bold;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        .todo-details {
+            color: #777;
+            font-size: 14px;
+            margin-top: 5px;
+            transition: color 0.3s;
+        }
+        
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .performance-table th, 
+        .performance-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            transition: border-color 0.3s, color 0.3s;
+        }
+        
+        .performance-table th {
+            font-weight: bold;
+            color: #333;
+            transition: color 0.3s;
+        }
+        
+        .good-stat {
+            color: #27ae60;
+            transition: color 0.3s;
+        }
+        
+        .bad-stat {
+            color: #e74c3c;
+            transition: color 0.3s;
+        }
+        
+        /* Empty page style */
+        .empty-page {
+            padding: 50px;
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+            grid-column: 1 / -1;
+            transition: color 0.3s;
+        }
+        
+        /* Loading spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e74c3c;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .sidebar,
+        body.dark-mode .header,
+        body.dark-mode .card {
+            background-color: #1e1e1e;
+            border-color: #333;
+        }
+
+        body.dark-mode .sidebar-header h2,
+        body.dark-mode .user-info,
+        body.dark-mode .section-title,
+        body.dark-mode .class-name,
+        body.dark-mode .todo-title,
+        body.dark-mode .performance-table th {
+            color: #fff;
+        }
+
+        body.dark-mode .menu-item {
+            color: #ccc;
+        }
+
+        body.dark-mode .menu-item.active {
+            color: #9b59b6;
+            background-color: #2d2d2d;
+            border-left-color: #9b59b6;
+        }
+
+        body.dark-mode .class-details,
+        body.dark-mode .todo-details,
+        body.dark-mode .performance-table td,
+        body.dark-mode .empty-page,
+        body.dark-mode .stat {
+            color: #aaa;
+        }
+
+        body.dark-mode .stat span,
+        body.dark-mode .bad-stat {
+            color: #ff6b6b;
+        }
+
+        body.dark-mode .good-stat {
+            color: #6bff6b;
+        }
+
+        body.dark-mode .logout-btn {
+            background-color: #ff6b6b;
+        }
+
+        body.dark-mode .logout-btn:hover {
+            background-color: #ff5252;
+        }
+
+        body.dark-mode .average-grade {
+            background-color: #9b59b6;
+        }
+
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .moon-icon, .sun-icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        .sun-icon {
+            display: none;
+            stroke: #f39c12;
+        }
+
+        body.dark-mode .moon-icon {
+            display: none;
+        }
+
+        body.dark-mode .sun-icon {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Teacher Dashboard</h2>
+            </div>
+            
+            <div class="menu">
+                <div class="menu-item active" data-page="dashboard">Dashboard</div>
+                <div class="menu-item" data-page="roster">Class Roster</div>
+                <div class="menu-item" data-page="gradebook">Gradebook</div>
+                <div class="menu-item" data-page="attendance">Attendance</div>
+                <div class="menu-item" data-page="reports">Reports</div>
+                <div class="menu-item" data-page="messages">Messages</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="user-info"></div>
+                <div class="header-actions">
+                    <div class="header-stats">
+                        <div class="stat">Classes <span>(4)</span></div>
+                        <div class="stat">Messages <span>(2)</span></div>
+                    </div>
+
+                    <button class="logout-btn">Logout</button>
+
+                    <button class="dark-mode-toggle" aria-label="Toggle dark mode">
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z" />
+                        </svg>
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f39c12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Content -->
+            <div id="dashboard-content" class="dashboard-content">
+                <div>
+                    <div class="section-title">CLASS PERFORMANCE</div>
+                    <div class="card">
+                        <div class="grade-chart-container">
+                            <canvas id="gradeChart"></canvas>
+                        </div>
+                        <div class="average-grade">
+                            <div class="average-grade-label">Overall Average</div>
+                            <div class="average-grade-value" id="grade-average">-</div>
+                            <div class="average-grade-label">Based on all classes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-title">TODAY'S SCHEDULE</div>
+                    <div class="card">
+                        <div class="class-item">
+                            <div class="class-name">Period 1: Algebra II - Room 203</div>
+                            <div class="class-details">9:00 AM - 10:30 AM | 24 students</div>
+                        </div>
+                        <div class="class-item">
+                            <div class="class-name">Period 3: Calculus - Room 205</div>
+                            <div class="class-details">11:00 AM - 12:30 PM | 18 students</div>
+                        </div>
+                        <div class="class-item">
+                            <div class="class-name">Period 5: Geometry - Room 210</div>
+                            <div class="class-details">1:30 PM - 3:00 PM | 22 students</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="section-title">PERFORMANCE SUMMARY</div>
+                    <div class="card">
+                        <table class="performance-table">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Avg Grade</th>
+                                    <th>A%</th>
+                                    <th>D/F%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Algebra II</td>
+                                    <td>82</td>
+                                    <td class="good-stat">35%</td>
+                                    <td class="bad-stat">12%</td>
+                                </tr>
+                                <tr>
+                                    <td>Calculus</td>
+                                    <td>85</td>
+                                    <td class="good-stat">42%</td>
+                                    <td class="bad-stat">8%</td>
+                                </tr>
+                                <tr>
+                                    <td>Geometry</td>
+                                    <td>78</td>
+                                    <td class="good-stat">28%</td>
+                                    <td class="bad-stat">15%</td>
+                                </tr>
+                                <tr>
+                                    <td>Statistics</td>
+                                    <td>80</td>
+                                    <td class="good-stat">32%</td>
+                                    <td class="bad-stat">10%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section-title">TASKS & REMINDERS</div>
+                    <div class="card">
+                        <div class="todo-item">
+                            <input type="checkbox" class="todo-checkbox">
+                            <div class="todo-text">
+                                <div class="todo-title">Grade Chapter 5 Tests</div>
+                                <div class="todo-details">Due Friday | Algebra II</div>
+                            </div>
+                        </div>
+                        <div class="todo-item">
+                            <input type="checkbox" class="todo-checkbox">
+                            <div class="todo-text">
+                                <div class="todo-title">Submit Attendance for Week</div>
+                                <div class="todo-details">Due today</div>
+                            </div>
+                        </div>
+                        <div class="todo-item">
+                            <input type="checkbox" class="todo-checkbox">
+                            <div class="todo-text">
+                                <div class="todo-title">Prepare Lesson Plan for Next Week</div>
+                                <div class="todo-details">Calculus</div>
+                            </div>
+                        </div>
+                        <div class="todo-item">
+                            <input type="checkbox" class="todo-checkbox">
+                            <div class="todo-text">
+                                <div class="todo-title">Parent-Teacher Conference</div>
+                                <div class="todo-details">Tomorrow 4:00 PM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty Pages for Other Tabs -->
+            <div id="roster-content" class="dashboard-content" style="display: none;">
+                <div class="empty-page">Class Roster page content will be added later</div>
+            </div>
+            
+            <div id="gradebook-content" class="dashboard-content" style="display: none;">
+                <div class="empty-page">Gradebook page content will be added later</div>
+            </div>
+            
+            <div id="attendance-content" class="dashboard-content" style="display: none;">
+                <div class="empty-page">Attendance page content will be added later</div>
+            </div>
+            
+            <div id="reports-content" class="dashboard-content" style="display: none;">
+                <div class="empty-page">Reports page content will be added later</div>
+            </div>
+            
+            <div id="messages-content" class="dashboard-content" style="display: none;">
+                <div class="empty-page">Messages page content will be added later</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display current user (same as admin.js)
+        function displayCurrentUser() {
+            const userData = JSON.parse(localStorage.getItem('currentUser'));
+            if (userData && userData.username) {
+                document.querySelector('.user-info').textContent = `Welcome, ${userData.username}`;
+            }
+        }
+
+        // Logout functionality (same as admin.js)
+        document.querySelector('.logout-btn')?.addEventListener('click', function() {
+            if (confirm("Are you sure you want to logout?")) {
+                localStorage.removeItem('currentUser');
+                alert("You have been logged out");
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Navigation functionality
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all menu items
+                document.querySelectorAll('.menu-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all content sections
+                document.querySelectorAll('.dashboard-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // Show the selected content
+                const pageId = this.getAttribute('data-page') + '-content';
+                document.getElementById(pageId).style.display = 'grid';
+            });
+        });
+        
+        // Todo checkbox functionality
+        document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const todoItem = this.closest('.todo-item');
+                if (this.checked) {
+                    todoItem.style.opacity = '0.6';
+                    todoItem.style.textDecoration = 'line-through';
+                } else {
+                    todoItem.style.opacity = '1';
+                    todoItem.style.textDecoration = 'none';
+                }
+            });
+        });
+        
+        // Dark mode toggle functionality
+        const darkModeToggle = document.querySelector('.dark-mode-toggle');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Check for saved user preference or use system preference
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+            document.body.classList.add('dark-mode');
+        }
+        
+        darkModeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+            updateChartColors();
+        });
+        
+        // Mock data for grades
+        const classData = [
+            { name: "Algebra II", average: 82, aPercent: 35, dfPercent: 12 },
+            { name: "Calculus", average: 85, aPercent: 42, dfPercent: 8 },
+            { name: "Geometry", average: 78, aPercent: 28, dfPercent: 15 },
+            { name: "Statistics", average: 80, aPercent: 32, dfPercent: 10 }
+        ];
+        
+        // Calculate overall average
+        function calculateOverallAverage() {
+            const total = classData.reduce((sum, cls) => sum + cls.average, 0);
+            return (total / classData.length).toFixed(1);
+        }
+        
+        // Grade Chart
+        let gradeChart;
+        
+        function createGradeChart() {
+            const ctx = document.getElementById('gradeChart').getContext('2d');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            
+            gradeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: classData.map(cls => cls.name),
+                    datasets: [
+                        {
+                            label: 'Average Grade',
+                            data: classData.map(cls => cls.average),
+                            backgroundColor: isDarkMode ? '#9b59b6' : '#e74c3c',
+                            borderColor: isDarkMode ? '#8e44ad' : '#c0392b',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'A Grades %',
+                            data: classData.map(cls => cls.aPercent),
+                            backgroundColor: isDarkMode ? '#2ecc71' : '#27ae60',
+                            borderColor: isDarkMode ? '#27ae60' : '#219653',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'D/F Grades %',
+                            data: classData.map(cls => cls.dfPercent),
+                            backgroundColor: isDarkMode ? '#e74c3c' : '#ff6b6b',
+                            borderColor: isDarkMode ? '#c0392b' : '#ff5252',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+                            },
+                            ticks: {
+                                color: isDarkMode ? '#e0e0e0' : '#333'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: isDarkMode ? '#e0e0e0' : '#333'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: isDarkMode ? '#e0e0e0' : '#333',
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += context.raw + '/100';
+                                    } else {
+                                        label += context.raw + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateChartColors() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            
+            if (gradeChart) {
+                // Update dataset colors
+                gradeChart.data.datasets[0].backgroundColor = isDarkMode ? '#9b59b6' : '#e74c3c';
+                gradeChart.data.datasets[0].borderColor = isDarkMode ? '#8e44ad' : '#c0392b';
+                
+                gradeChart.data.datasets[1].backgroundColor = isDarkMode ? '#2ecc71' : '#27ae60';
+                gradeChart.data.datasets[1].borderColor = isDarkMode ? '#27ae60' : '#219653';
+                
+                gradeChart.data.datasets[2].backgroundColor = isDarkMode ? '#e74c3c' : '#ff6b6b';
+                gradeChart.data.datasets[2].borderColor = isDarkMode ? '#c0392b' : '#ff5252';
+                
+                // Update scale colors
+                gradeChart.options.scales.y.grid.color = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                gradeChart.options.scales.y.ticks.color = isDarkMode ? '#e0e0e0' : '#333';
+                gradeChart.options.scales.x.ticks.color = isDarkMode ? '#e0e0e0' : '#333';
+                
+                // Update legend colors
+                gradeChart.options.plugins.legend.labels.color = isDarkMode ? '#e0e0e0' : '#333';
+                
+                gradeChart.update();
+            }
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set overall average
+            document.getElementById('grade-average').textContent = calculateOverallAverage();
+            
+            // Create chart
+            createGradeChart();
+            displayCurrentUser();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,715 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Students Dashboard</title>
+  <!-- Add Chart.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 250px;
+      background-color: white;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      padding: 20px 0;
+    }
+
+    .sidebar h2 {
+      padding: 0 20px 20px;
+      margin: 0;
+      border-bottom: 1px solid #eee;
+      color: #6c5ce7;
+    }
+
+    .menu-item {
+      padding: 12px 20px;
+      color: #555;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+    }
+
+    .menu-item:hover {
+      background-color: #f8f9fa;
+    }
+
+    .menu-item.active {
+      border-left: 4px solid #6c5ce7;
+      background-color: #f1f0ff;
+      color: #6c5ce7;
+    }
+
+    .admin-panel {
+      padding: 20px;
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    /* Main Content Styles */
+    .content-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-content {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid #e0e0e0;
+      background-color: white;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .notification {
+      position: relative;
+      margin-right: 15px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .logout-btn {
+      background-color: #9b59b6;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .logout-btn:hover {
+      background-color: #8e44ad;
+    }
+
+    .dark-mode-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Dashboard Content */
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .card {
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: white;
+    }
+
+    .class-item {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .class-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .class-name {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .class-details {
+      color: #777;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .grades-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .grade-item {
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: white;
+    }
+
+    .grade-course {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .grade-score {
+      color: #27ae60;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .grade-score.b-plus {
+      color: #f39c12;
+    }
+
+    .grade-score.c {
+      color: #e67e22;
+    }
+
+    .grade-score.d {
+      color: #e74c3c;
+    }
+
+    /* Grade Chart Container */
+    .grade-chart-container {
+      position: relative;
+      height: 250px;
+      margin-bottom: 20px;
+    }
+
+    /* Average grade display */
+    .average-grade {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 15px;
+      background-color: #6c5ce7;
+      color: white;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .average-grade-value {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+
+    .average-grade-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* Grades table */
+    .grades-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .grades-table th, 
+    .grades-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .grades-table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+
+    .grades-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Empty page style */
+    .empty-page {
+      padding: 50px;
+      text-align: center;
+      color: #777;
+      font-size: 18px;
+      grid-column: 1 / -1;
+    }
+
+    /* Loading spinner */
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #6c5ce7;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .sidebar,
+    body.dark-mode .header,
+    body.dark-mode .card,
+    body.dark-mode .grade-item,
+    body.dark-mode .grades-table th {
+      background-color: #1e1e1e;
+      border-color: #333;
+    }
+
+    body.dark-mode .sidebar h2,
+    body.dark-mode .section-title,
+    body.dark-mode .user-info,
+    body.dark-mode .class-name,
+    body.dark-mode .grade-course {
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .menu-item {
+      color: #ccc;
+    }
+
+    body.dark-mode .menu-item.active {
+      color: #8e44ad;
+      background-color: #2d2d2d;
+    }
+
+    body.dark-mode .card p,
+    body.dark-mode .class-details,
+    body.dark-mode .grades-table td {
+      color: #aaa;
+    }
+
+    body.dark-mode .grades-table th {
+      background-color: #2a2a2a;
+    }
+
+    body.dark-mode .grades-table tr {
+      border-bottom-color: #333;
+    }
+
+    body.dark-mode .average-grade {
+      background-color: #8e44ad;
+    }
+
+    /* Dark mode toggle icons */
+    .moon-icon, .sun-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .sun-icon {
+      display: none;
+    }
+
+    body.dark-mode .moon-icon {
+      display: none;
+    }
+
+    body.dark-mode .sun-icon {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Students Menu</h2>
+    
+    <div class="menu">
+      <div class="menu-item active" data-page="dashboard">Dashboard</div>
+      <div class="menu-item" data-page="grades">Grades</div>
+      <div class="menu-item" data-page="messages">Messages</div>
+    </div>
+    
+    <div class="admin-panel">
+      <h3>Students Panel</h3>
+    </div>
+  </div>
+  
+  <!-- Main Content Container -->
+  <div class="content-container">
+    <div class="header">
+      <div class="user-info"></div>
+      <div style="display: flex; align-items: center;">
+        <div class="notification">
+        </div>
+        <button class="logout-btn">Logout</button>
+        <button class="dark-mode-toggle" aria-label="Toggle dark mode">
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z"/>
+          </svg>
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f39c12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard Content (shown by default) -->
+    <div id="dashboard-content" class="main-content">
+      <div>
+        <div class="section-title">GRADE PERFORMANCE</div>
+        <div class="card">
+          <div class="grade-chart-container">
+            <canvas id="gradeChart"></canvas>
+          </div>
+          <div class="average-grade">
+            <div class="average-grade-label">Current Average</div>
+            <div class="average-grade-value" id="grade-average">-</div>
+            <div class="average-grade-label">Based on 5 subjects</div>
+          </div>
+        </div>
+
+        <div class="section-title">UPCOMING CLASSES</div>
+        <div class="card">
+          <div class="class-item">
+            <div class="class-name">Math - Room 203</div>
+            <div class="class-details">9:00 AM - 10:30 AM</div>
+          </div>
+          <div class="class-item">
+            <div class="class-name">Science - Lab 1</div>
+            <div class="class-details">11:00 AM - 12:30 PM</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">RECENT GRADES</div>
+        <div class="grades-container">
+          <div class="grade-item">
+            <div class="grade-course">Math Test</div>
+            <div class="grade-score">A</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-course">Science Quiz</div>
+            <div class="grade-score b-plus">B+</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-course">History Exam</div>
+            <div class="grade-score">A-</div>
+          </div>
+          <div class="grade-item">
+            <div class="grade-course">English Essay</div>
+            <div class="grade-score">B</div>
+          </div>
+        </div>
+
+        <div class="section-title">ANNOUNCEMENTS</div>
+        <div class="card">
+          <div class="class-item">
+            <div class="class-name">School closed Friday</div>
+            <div class="class-details">For staff development</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grades Content -->
+    <div id="grades-content" class="main-content" style="display: none;">
+      <div style="grid-column: 1 / -1;">
+        <div class="section-title">MY GRADES</div>
+        <div class="card">
+          <div id="grades-loading" class="loader" style="display: none;"></div>
+          <table class="grades-table" id="grades-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Assignment</th>
+                <th>Grade</th>
+                <th>Date</th>
+                <th>Comments</th>
+              </tr>
+            </thead>
+            <tbody id="grades-table-body">
+              <!-- Grades will be loaded here from API -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Content -->
+    <div id="messages-content" class="main-content" style="display: none;">
+      <div class="empty-page">Messages page content will be added later</div>
+    </div>
+  </div>
+
+  <script>
+    // Dark mode toggle functionality
+    const darkModeToggle = document.querySelector('.dark-mode-toggle');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+      document.body.classList.add('dark-mode');
+    }
+    function displayCurrentUser() {
+        const userData = JSON.parse(localStorage.getItem('currentUser'));
+        if (userData && userData.username) {
+            document.querySelector('.user-info').textContent = `Welcome, ${userData.username}`;
+        }
+    }
+
+    // Logout functionality (same as admin.js)
+    document.querySelector('.logout-btn')?.addEventListener('click', function() {
+        if (confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem('currentUser');
+            alert("You have been logged out");
+            window.location.href = 'login.html';
+        }
+    });
+
+    darkModeToggle.addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+      updateChartColors();
+    });
+
+    // Menu item click functionality
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', function() {
+        // Remove active class from all nav items
+        document.querySelectorAll('.menu-item').forEach(i => {
+          i.classList.remove('active');
+        });
+        
+        // Add active class to clicked item
+        this.classList.add('active');
+        
+        // Hide all content sections
+        document.querySelectorAll('.main-content').forEach(content => {
+          content.style.display = 'none';
+        });
+        
+        // Show the selected content
+        const pageId = this.getAttribute('data-page') + '-content';
+        document.getElementById(pageId).style.display = 'grid';
+        
+        // Load grades when grades page is opened
+        if (pageId === 'grades-content') {
+          loadGrades();
+        }
+      });
+    });
+
+    // Mock API data for grades
+    const mockGrades = [
+      { subject: "Mathematics", assignment: "Final Exam", grade: "A", date: "2023-05-15", comments: "Excellent work!" },
+      { subject: "Science", assignment: "Lab Report", grade: "B+", date: "2023-05-10", comments: "Good analysis" },
+      { subject: "History", assignment: "Research Paper", grade: "A-", date: "2023-05-08", comments: "Well researched" },
+      { subject: "English", assignment: "Creative Writing", grade: "B", date: "2023-05-05", comments: "Creative ideas" },
+      { subject: "Physical Education", assignment: "Fitness Test", grade: "A", date: "2023-05-03", comments: "Great improvement" },
+      { subject: "Mathematics", assignment: "Chapter Test", grade: "A-", date: "2023-04-28", comments: "Minor calculation errors" },
+      { subject: "Science", assignment: "Quiz 3", grade: "B", date: "2023-04-25", comments: "Study chemical formulas" }
+    ];
+
+    // Calculate average grade
+    function calculateAverage(grades) {
+      const gradeValues = {
+        'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+        'C+': 2.3, 'C': 2.0, 'C-': 1.7, 'D+': 1.3, 'D': 1.0, 'F': 0
+      };
+      
+      let total = 0;
+      let count = 0;
+      
+      grades.forEach(grade => {
+        if (gradeValues[grade.grade] !== undefined) {
+          total += gradeValues[grade.grade];
+          count++;
+        }
+      });
+      
+      return count > 0 ? (total / count).toFixed(2) : 0;
+    }
+
+    // Load grades from API (mock)
+    function loadGrades() {
+      const gradesTable = document.getElementById('grades-table-body');
+      const loadingElement = document.getElementById('grades-loading');
+      
+      // Show loading spinner
+      gradesTable.innerHTML = '';
+      loadingElement.style.display = 'block';
+      
+      // Simulate API call with timeout
+      setTimeout(() => {
+        // Update average grade in dashboard
+        const average = calculateAverage(mockGrades);
+        document.getElementById('grade-average').textContent = average;
+        
+        // Populate grades table
+        mockGrades.forEach(grade => {
+          const row = document.createElement('tr');
+          
+          // Determine grade class for color
+          let gradeClass = '';
+          if (grade.grade.includes('A')) gradeClass = 'grade-score';
+          else if (grade.grade.includes('B')) gradeClass = 'grade-score b-plus';
+          else if (grade.grade.includes('C')) gradeClass = 'grade-score c';
+          else if (grade.grade.includes('D') || grade.grade.includes('F')) gradeClass = 'grade-score d';
+          
+          row.innerHTML = `
+            <td>${grade.subject}</td>
+            <td>${grade.assignment}</td>
+            <td><span class="${gradeClass}">${grade.grade}</span></td>
+            <td>${grade.date}</td>
+            <td>${grade.comments}</td>
+          `;
+          gradesTable.appendChild(row);
+        });
+        
+        // Hide loading spinner
+        loadingElement.style.display = 'none';
+      }, 800); // Simulate network delay
+    }
+
+    // Grade Chart
+    let gradeChart;
+
+    function createGradeChart() {
+      const ctx = document.getElementById('gradeChart').getContext('2d');
+      
+      // Group grades by subject and calculate average for each
+      const subjects = {};
+      mockGrades.forEach(grade => {
+        if (!subjects[grade.subject]) {
+          subjects[grade.subject] = [];
+        }
+        subjects[grade.subject].push(grade);
+      });
+      
+      const subjectNames = Object.keys(subjects);
+      const subjectAverages = subjectNames.map(subject => {
+        return calculateAverage(subjects[subject]);
+      });
+      
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      
+      gradeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: subjectNames,
+          datasets: [{
+            label: 'Average Grade',
+            data: subjectAverages,
+            backgroundColor: isDarkMode ? '#8e44ad' : '#6c5ce7',
+            borderColor: isDarkMode ? '#9b59b6' : '#5d4ac7',
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 4.0,
+              grid: {
+                color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: isDarkMode ? '#e0e0e0' : '#333'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: isDarkMode ? '#e0e0e0' : '#333'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Average: ${context.raw}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChartColors() {
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      
+      if (gradeChart) {
+        gradeChart.data.datasets[0].backgroundColor = isDarkMode ? '#8e44ad' : '#6c5ce7';
+        gradeChart.data.datasets[0].borderColor = isDarkMode ? '#9b59b6' : '#5d4ac7';
+        
+        gradeChart.options.scales.y.grid.color = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        gradeChart.options.scales.y.ticks.color = isDarkMode ? '#e0e0e0' : '#333';
+        gradeChart.options.scales.x.ticks.color = isDarkMode ? '#e0e0e0' : '#333';
+        
+        gradeChart.update();
+      }
+    }
+
+    // Initialize with average grade calculation and chart
+    document.addEventListener('DOMContentLoaded', () => {
+      const average = calculateAverage(mockGrades);
+      document.getElementById('grade-average').textContent = average;
+      createGradeChart();
+      displayCurrentUser();
+    });
+  </script>
+</body>
+</html>

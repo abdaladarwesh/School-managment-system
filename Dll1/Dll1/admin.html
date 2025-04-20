@@ -1,0 +1,725 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin.js" defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .dark-mode .sidebar {
+            background-color: #1a1a1a;
+        }
+
+        .sidebar-title {
+            padding: 0 20px 15px;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .sidebar-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(155, 89, 182, 0.3);
+            border-left: 4px solid #9b59b6;
+        }
+
+        .dark-mode .sidebar-item.active {
+            background-color: rgba(142, 68, 173, 0.3);
+            border-left-color: #8e44ad;
+        }
+
+        /* Main Content */
+        .dashboard {
+            flex-grow: 1;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .dashboard {
+            background-color: #1e1e1e;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .dark-mode .header {
+            border-bottom-color: #333;
+        }
+
+        .header-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .dark-mode .header-title {
+            color: #e0e0e0;
+        }
+
+        .user-info {
+            color: #555;
+        }
+
+        .dark-mode .user-info {
+            color: #aaa;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Dark Mode Button (Far Right) */
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            margin-left: 15px;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        .moon-icon {
+            transition: transform 0.3s, stroke 0.3s;
+        }
+
+        .dark-mode .moon-icon {
+            stroke: #f1c40f;
+            transform: rotate(30deg);
+        }
+
+        .logout-btn {
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .dark-mode .logout-btn {
+            background-color: #8e44ad;
+        }
+
+        .logout-btn:hover {
+            background-color: #8e44ad;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .dark-mode .section-title {
+            color: #e0e0e0;
+        }
+
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode .card {
+            border-color: #333;
+            background-color: #252525;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .dark-mode .stat-item {
+            background-color: #2a2a2a;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #9b59b6;
+        }
+
+        .dark-mode .stat-value {
+            color: #8e44ad;
+        }
+
+        .stat-label {
+            color: #777;
+            align-self: flex-end;
+        }
+
+        .dark-mode .stat-label {
+            color: #999;
+        }
+
+        .actions-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .dark-mode .action-btn {
+            background-color: #8e44ad;
+        }
+
+        .action-btn:hover {
+            background-color: #8e44ad;
+        }
+
+        .alert-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #9b59b6;
+            background-color: #f9f9f9;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .dark-mode .alert-item {
+            background-color: #2a2a2a;
+            border-left-color: #8e44ad;
+        }
+
+        .alert-item.warning {
+            border-left-color: #f39c12;
+        }
+
+        .dark-mode .alert-item.warning {
+            border-left-color: #e67e22;
+        }
+
+        .alert-item.error {
+            border-left-color: #e74c3c;
+        }
+
+        .dark-mode .alert-item.error {
+            border-left-color: #c0392b;
+        }
+
+        .empty-page {
+            padding: 50px;
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+        }
+
+        .dark-mode .empty-page {
+            color: #999;
+        }
+        
+        /* New styles for students page */
+        .students-container, .staff-container {
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+        
+        .student-buttons, .staff-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .student-form, .staff-form {
+            display: none;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .dark-mode .student-form, .dark-mode .staff-form {
+            background-color: #2a2a2a;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .dark-mode .form-group input, .dark-mode .form-group select {
+            background-color: #333;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+        
+        .submit-btn {
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .dark-mode .submit-btn {
+            background-color: #8e44ad;
+        }
+        
+        .submit-btn:hover {
+            background-color: #8e44ad;
+        }
+        
+        .remove-student-form, .remove-staff-form {
+            display: none;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .dark-mode .remove-student-form, .dark-mode .remove-staff-form {
+            background-color: #2a2a2a;
+        }
+        
+        .danger-btn {
+            background-color: #e74c3c;
+        }
+        
+        .dark-mode .danger-btn {
+            background-color: #c0392b;
+        }
+        
+        .danger-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .student-counter, .staff-counter {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .dark-mode .student-counter, .dark-mode .staff-counter {
+            background-color: #2a2a2a;
+        }
+        
+        /* Tables styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .dark-mode .data-table th, 
+        .dark-mode .data-table td {
+            border-bottom-color: #444;
+        }
+        
+        .data-table th {
+            background-color: #9b59b6;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .dark-mode .data-table th {
+            background-color: #8e44ad;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .dark-mode .data-table tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+        
+        .data-table tr:hover {
+            background-color: #e6e6e6;
+        }
+        
+        .dark-mode .data-table tr:hover {
+            background-color: #333;
+        }
+        
+        .action-cell {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .table-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .edit-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        /* Chart container styles */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-title">Admin Menu</div>
+        <div class="sidebar-item active" data-page="dashboard">Dashboard</div>
+        <div class="sidebar-item" data-page="students">Students</div>
+        <div class="sidebar-item" data-page="staff">Staff</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard">
+        <div class="header">
+            <div class="header-title">Admin Panel</div>
+            <div class="header-right">
+                <div class="user-info">Welcome</div>
+                <button class="logout-btn">Logout</button>
+                <button class="dark-mode-toggle" aria-label="Toggle dark mode">
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0012 21a9 9 0 009-8.21z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="dashboard-content" class="main-content">
+            <div>
+                <div class="section-title">SYSTEM OVERVIEW</div>
+                <div class="card">
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <div class="stat-value" id="students">Loading...</div>
+                            <div class="stat-label">Students</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="teachers">Loading...</div>
+                            <div class="stat-label">Teachers</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="classes">Loading...</div>
+                            <div class="stat-label">Classes</div>
+                        </div>
+                    </div>                
+                </div>
+
+                <div class="section-title">RECENT ALERTS</div>
+                <div class="card">
+                    <div class="alert-item">3 Unapproved absence requests</div>
+                    <div class="alert-item warning">System update available (v2.3.1)</div>
+                    <div class="alert-item error">Low disk space on server (15% remaining)</div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">STUDENT DISTRIBUTION</div>
+                <div class="card">
+                    <div class="chart-container">
+                        <canvas id="studentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="students-content" class="main-content" style="display: none;">
+            <div class="students-container">
+                <div class="section-title">STUDENT MANAGEMENT</div>
+                <div class="student-counter">
+                    Total Students: <span id="students-count">0</span>
+                </div>
+                <div class="card">
+                    <div class="student-buttons">
+                        <button id="add-student-btn" class="action-btn">Add Student</button>
+                        <button id="remove-student-btn" class="action-btn danger-btn">Remove Student</button>
+                    </div>
+                    
+                    <!-- Add Student Form -->
+                    <div id="add-student-form" class="student-form">
+                        <h3>Add New Student</h3>
+                        <form id="student-form">
+                            <div class="form-group">
+                                <label for="student-name">Student Name:</label>
+                                <input type="text" id="student-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-password">Password:</label>
+                                <input type="password" id="student-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-grade">Grade:</label>
+                                <input type="text" id="student-grade" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="student-class">Class:</label>
+                                <input type="text" id="student-class" required>
+                            </div>
+                            <button type="submit" class="submit-btn">Add Student</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Remove Student Form -->
+                    <div id="remove-student-form" class="remove-student-form">
+                        <h3>Remove Student</h3>
+                        <form id="remove-student-form">
+                            <div class="form-group">
+                                <label for="remove-student-name">Student Name:</label>
+                                <input type="text" id="remove-student-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="remove-student-grade">Grade:</label>
+                                <input type="text" id="remove-student-grade" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="remove-student-class">Class:</label>
+                                <input type="text" id="remove-student-class" required>
+                            </div>
+                            <button type="submit" class="submit-btn danger-btn">Remove Student</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Students Table -->
+                    <table class="data-table" id="students-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Grade</th>
+                                <th>Class</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Students will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="staff-content" class="main-content" style="display: none;">
+            <div class="staff-container">
+                <div class="section-title">STAFF MANAGEMENT</div>
+                <div class="staff-counter">
+                    Total Staff: <span id="staff-count">0</span>
+                </div>
+                <div class="card">
+                    <div class="staff-buttons">
+                        <button id="add-staff-btn" class="action-btn">Add Staff</button>
+                        <button id="remove-staff-btn" class="action-btn danger-btn">Remove Staff</button>
+                    </div>
+                    
+                    <!-- Add Staff Form -->
+                    <div id="add-staff-form" class="staff-form">
+                        <h3>Add New Staff</h3>
+                        <form id="staff-form">
+                            <div class="form-group">
+                                <label for="staff-name">Staff Name:</label>
+                                <input type="text" id="staff-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="staff-password">Password:</label>
+                                <input type="password" id="staff-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="staff-position">Grade:</label>
+                                <select id="staff-position" required>
+                                    <option value="">Select Grade</option>
+                                    <option value="Grade 9">Grade 9</option>
+                                    <option value="Grade 10">Grade 10</option>
+                                    <option value="Grade 11">Grade 11</option>
+                                    <option value="Grade 12">Grade 12</option>
+                                    <option value="Grade 13">Grade 13</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="staff-class">Class:</label>
+                                <select id="staff-class" required>
+                                    <option value="">Select Class</option>
+                                    <option value="Class 1A">Class 1A</option>
+                                    <option value="Class 1B">Class 1B</option>
+                                    <option value="Class 2A">Class 2A</option>
+                                    <option value="Class 2B">Class 2B</option>
+                                    <option value="Class 3A">Class 3A</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="staff-department">Subject:</label>
+                                <select id="staff-department" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="Science">Science</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Languages">Languages</option>
+                                    <option value="Arts">Arts</option>
+                                    <option value="Sports">Sports</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="submit-btn">Add Staff</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Remove Staff Form -->
+                    <div id="remove-staff-form" class="remove-staff-form">
+                        <h3>Remove Staff</h3>
+                        <form id="remove-staff-form">
+                            <div class="form-group">
+                                <label for="remove-staff-name">Staff Name:</label>
+                                <input type="text" id="remove-staff-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="remove-staff-position">Position:</label>
+                                <select id="remove-staff-position" required>
+                                    <option value="">Select Position</option>
+                                    <option value="Teacher">Teacher</option>
+                                    <option value="Administrator">Administrator</option>
+                                    <option value="Librarian">Librarian</option>
+                                    <option value="Janitor">Janitor</option>
+                                    <option value="Security">Security</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="remove-staff-department">Department:</label>
+                                <select id="remove-staff-department" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Science">Science</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Languages">Languages</option>
+                                    <option value="Arts">Arts</option>
+                                    <option value="Sports">Sports</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="submit-btn danger-btn">Remove Staff</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Staff Table -->
+                    <table class="data-table" id="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Grade</th>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Staff will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
