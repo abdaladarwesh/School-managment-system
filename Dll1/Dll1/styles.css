@@ -101,7 +101,7 @@ body.dark-mode .header-left h2 {
 }
 
 /* Update user-info styles */
-.user-info {
+.user-in {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -366,12 +366,12 @@ body.dark-mode .search-bar input {
 
 .modal-content {
     background: white;
-    margin: 15% auto;
+    margin: 5% auto;
     padding: 20px;
     width: 90%;
     max-width: 500px;
     border-radius: 8px;
-    position: relative;
+    position:center;
 }
 
 .form-group {
@@ -546,4 +546,99 @@ body.dark-mode .class-dropdown {
     background: #2d2d2d;
     color: white;
     border-color: #444;
+}
+.logout-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.logout-btn:hover {
+        background-color: #c0392b;
+}
+
+/* Gradebook Styles */
+.student-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin: 5px 0;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.student-name {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.btn-grade {
+    background-color: #e44c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+    .btn-grade:hover {
+        background-color: #8f2e24;
+    }
+
+.class-header {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Gradebook Styles */
+body.dark-mode .student-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin: 5px 0;
+    background-color: #5e5e5e;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+body.dark-mode .student-name {
+    font-weight: 500;
+    color: #fff;
+}
+
+.btn-grade {
+    background-color: #e44c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+    .btn-grade:hover {
+        background-color: #8f2e24;
+    }
+
+body.dark-mode .class-header {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    color: #eee;
+    font-weight: 600;
 }

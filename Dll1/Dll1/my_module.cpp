@@ -1144,7 +1144,210 @@ public:
 			throw std::runtime_error("Error fetching subject degrees: " + std::string(e.what()));
 		}
 	}
+	py::dict get_grades(const std::string& username) {
+		try {
+			py::dict grades_dict;
 
+			// First get the teacher_id from username
+			int teacher_id = 0;
+			{
+				nanodbc::statement id_stmt(conn_);
+				id_stmt.prepare(
+					"SELECT t.teacher_id FROM teachers t "
+					"JOIN users u ON t.user_id = u.user_id "
+					"WHERE u.username = ?"
+				);
+				id_stmt.bind(0, username.c_str());
+				nanodbc::result id_result = id_stmt.execute();
+
+				if (!id_result.next()) {
+					throw std::runtime_error("Teacher not found with username: " + username);
+				}
+				teacher_id = id_result.get<int>(0);
+			}
+
+			// Get all grades that this teacher teaches and count of students in each
+			nanodbc::statement stmt(conn_);
+			stmt.prepare(
+				"SELECT g.grade_name, COUNT(s.student_id) as student_count "
+				"FROM teacher_with_grade twg "
+				"JOIN grade g ON twg.grade_id = g.grade_id "
+				"JOIN students s ON g.grade_id = s.grade_id "
+				"WHERE twg.teacher_id = ? "
+				"GROUP BY g.grade_name"
+			);
+			stmt.bind(0, &teacher_id);
+
+			nanodbc::result result = stmt.execute();
+
+			while (result.next()) {
+				std::string grade_name = result.get<std::string>(0);
+				int student_count = result.get<int>(1);
+				grades_dict[grade_name.c_str()] = student_count;
+			}
+
+			return grades_dict;
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Error fetching grade counts: " + std::string(e.what()));
+		}
+	}
+	py::list getStdPerGrade(const std::string& username, const std::string& grade_name) {
+		try {
+			py::list students_list;
+
+			// First get the teacher_id from username
+			int teacher_id = 0;
+			{
+				nanodbc::statement id_stmt(conn_);
+				id_stmt.prepare(
+					"SELECT t.teacher_id FROM teachers t "
+					"JOIN users u ON t.user_id = u.user_id "
+					"WHERE u.username = ?"
+				);
+				id_stmt.bind(0, username.c_str());
+				nanodbc::result id_result = id_stmt.execute();
+
+				if (!id_result.next()) {
+					throw std::runtime_error("Teacher not found with username: " + username);
+				}
+				teacher_id = id_result.get<int>(0);
+			}
+
+			// Verify the teacher teaches this grade
+			{
+				nanodbc::statement check_stmt(conn_);
+				check_stmt.prepare(
+					"SELECT 1 FROM teacher_with_grade twg "
+					"JOIN grade g ON twg.grade_id = g.grade_id "
+					"WHERE twg.teacher_id = ? AND g.grade_name = ?"
+				);
+				check_stmt.bind(0, &teacher_id);
+				check_stmt.bind(1, grade_name.c_str());
+
+				nanodbc::result check_result = check_stmt.execute();
+				if (!check_result.next()) {
+					throw std::runtime_error("Teacher doesn't teach grade: " + grade_name);
+				}
+			}
+
+			// Get all students in this grade taught by this teacher
+			nanodbc::statement stmt(conn_);
+			stmt.prepare(
+				"SELECT u.username, c.name as class_name "
+				"FROM students s "
+				"JOIN users u ON s.user_id = u.user_id "
+				"JOIN classes c ON s.class_id = c.class_id "
+				"JOIN grade g ON s.grade_id = g.grade_id "
+				"JOIN teacher_with_grade twg ON g.grade_id = twg.grade_id "
+				"WHERE twg.teacher_id = ? AND g.grade_name = ? "
+				"ORDER BY u.username"
+			);
+			stmt.bind(0, &teacher_id);
+			stmt.bind(1, grade_name.c_str());
+
+			nanodbc::result result = stmt.execute();
+
+			while (result.next()) {
+				py::dict student_dict;
+				std::string student_username = result.get<std::string>(0);
+				std::string class_name = result.get<std::string>(1);
+
+				student_dict["username"] = student_username;
+				student_dict["class_name"] = class_name;
+				students_list.append(student_dict);
+			}
+
+			return students_list;
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Error fetching students: " + std::string(e.what()));
+		}
+	}
+	void insert_grade(const std::string& username, const std::string& student_username,
+		const std::string& subject_name, const int& grade,
+		const std::string& date, const std::string& comment,
+		const std::string& assignment = "Quiz") {
+		try {
+			// First get the teacher_id from username
+			int teacher_id = 0;
+			{
+				nanodbc::statement teacher_stmt(conn_);
+				teacher_stmt.prepare(
+					"SELECT t.teacher_id FROM teachers t "
+					"JOIN users u ON t.user_id = u.user_id "
+					"WHERE u.username = ?"
+				);
+				teacher_stmt.bind(0, username.c_str());
+				nanodbc::result teacher_result = teacher_stmt.execute();
+
+				if (!teacher_result.next()) {
+					throw std::runtime_error("Teacher not found with username: " + username);
+				}
+				teacher_id = teacher_result.get<int>(0);
+			}
+
+			// Get the student_id from student_username
+			int student_id = 0;
+			{
+				nanodbc::statement student_stmt(conn_);
+				student_stmt.prepare(
+					"SELECT s.student_id FROM students s "
+					"JOIN users u ON s.user_id = u.user_id "
+					"WHERE u.username = ?"
+				);
+				student_stmt.bind(0, student_username.c_str());
+				nanodbc::result student_result = student_stmt.execute();
+
+				if (!student_result.next()) {
+					throw std::runtime_error("Student not found with username: " + student_username);
+				}
+				student_id = student_result.get<int>(0);
+			}
+
+			// Get the subject_id from subject_name
+			int subject_id = 0;
+			{
+				nanodbc::statement subject_stmt(conn_);
+				subject_stmt.prepare(
+					"SELECT sub_id FROM subjects "
+					"WHERE sub_name = ? AND teacher_id = ?"
+				);
+				subject_stmt.bind(0, subject_name.c_str());
+				subject_stmt.bind(1, &teacher_id);
+				nanodbc::result subject_result = subject_stmt.execute();
+
+				if (!subject_result.next()) {
+					throw std::runtime_error("Subject not found or not taught by this teacher: " + subject_name);
+				}
+				subject_id = subject_result.get<int>(0);
+			}
+
+
+			// Insert the grade record
+			{
+				nanodbc::statement insert_stmt(conn_);
+				insert_stmt.prepare(
+					"INSERT INTO degree_with_subject "
+					"(sub_id, degree_date, degree, assignment, student_id, teacher_comment) "
+					"VALUES (?, TO_DATE(?, 'DD-MM-YYYY'), ?, ?, ?, ?)"
+				);
+				insert_stmt.bind(0, &subject_id);
+				insert_stmt.bind(1, date.c_str());
+				insert_stmt.bind(2, &grade);
+				insert_stmt.bind(3, assignment.c_str());
+				insert_stmt.bind(4, &student_id);
+				insert_stmt.bind(5, comment.empty() ? nullptr : comment.c_str());
+
+				if (!insert_stmt.execute()) {
+					throw std::runtime_error("Failed to insert grade record");
+				}
+			}
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Error inserting grade: " + std::string(e.what()));
+		}
+	}
 private:
 	nanodbc::connection conn_;
 };
@@ -1170,7 +1373,11 @@ PYBIND11_MODULE(my_module, m) {
 		.def("get_students_per_grade", &OracleConnector::get_students_per_grade)
 		.def("get_latest_subject_degrees", &OracleConnector::get_latest_subject_degrees)
 		.def("get_latest_avg_degrees", &OracleConnector::get_latest_avg_degrees)
-		.def("get_degrees", &OracleConnector::get_degrees);
+		.def("get_degrees", &OracleConnector::get_degrees)
+		.def("get_grades", &OracleConnector::get_grades)
+		.def("getStdPerGrade", &OracleConnector::getStdPerGrade)
+		.def("insert_grade", &OracleConnector::insert_grade);
+
 
 
 

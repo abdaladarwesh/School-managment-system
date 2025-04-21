@@ -115,9 +115,24 @@ def latestgrades(username):
 @app.route('/avg/grades/<string:username>' , methods= ['GET'])
 def avggrades(username):
 	return conn.get_latest_avg_degrees(username) , 200
+
 @app.route('/grades/<string:username>' , methods= ['GET'])
 def getgrades(username):
 	return conn.get_degrees(username) , 200
+
+@app.route('/grades/teacher/<string:username>' , methods= ['GET'])
+def getgradesss(username):
+	return conn.get_grades(username) , 200
+
+@app.route('/student/teacher/<string:username>/<string:grade>' , methods= ['GET'])
+def getgradesssss(username, grade):
+	students = conn.getStdPerGrade(username, grade)
+	return jsonify([students['username'] for students in students]), 200
+
+@app.route('/get-student/teacher/<string:username>/<string:grade>' , methods= ['GET'])
+def getgradesssssss(username, grade):
+	students = conn.getStdPerGrade(username, grade)
+	return jsonify(students), 200
 
 
 

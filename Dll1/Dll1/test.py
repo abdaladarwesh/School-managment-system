@@ -5,9 +5,8 @@ conn = my_module.connect()
 
 
 
-teachers = conn.get_latest_subject_degrees("emily.davis")
+conn.insert_grade("mr.smith", "alice.student","Mathematics",66,"15-11-2009","first try" , "mid term")
 
 
 
 
-print(teachers)

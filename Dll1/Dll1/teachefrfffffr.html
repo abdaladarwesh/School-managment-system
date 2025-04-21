@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="School Logo">
+                <h2>Teacher Dashboard</h2>
+            </div>
+            <nav>
+                <a href="#" class="nav-item active" data-content="overview">Overview</a>
+                <a href="#" class="nav-item" data-content="roster">Class Roster</a>
+                <a href="#" class="nav-item" data-content="gradebook">Gradebook</a>
+                <a href="#" class="nav-item" data-content="attendance">Attendance</a>
+              
+                <a href="#" class="nav-item" data-content="calendar">Calendar</a>
+            </nav>
+            <!-- Remove the theme-toggle div from sidebar -->
+        </div>
+
+        <div class="main-content">
+            <!-- Update the header div -->
+            <div class="header">
+                <div class="header-left">
+                    <h2>Welcome, John Doe</h2>
+                </div>
+                <div class="user-info">
+                    <div class="theme-toggle">
+                        <span class="theme-icon">🌙</span>
+                        <label class="switch">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <span class="notification">🔔</span>
+                    <span class="user-name">John Doe</span>
+                    <img src="profile.jpg" alt="Profile" class="profile-pic">
+                </div>
+            </div>
+
+            <div id="overview-content" class="dashboard-content">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-title">Total Students</div>
+                        <div class="card-value">150</div>
+                        <div class="card-change increase">+5% from last month</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Average Attendance</div>
+                        <div class="card-value">92%</div>
+                        <div class="card-change decrease">-2% from last month</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Average Grade</div>
+                        <div class="card-value">B+</div>
+                        <div class="card-change increase">+3% from last month</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Upcoming Tests</div>
+                        <div class="card-value">4</div>
+                        <div class="card-change">Next test in 3 days</div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <div class="section-title">Grade Distribution</div>
+                        <canvas id="gradeChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="section-title">Attendance Trend</div>
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <div class="section-title">Recent Activity</div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📝</div>
+                        <div class="activity-details">
+                            <div class="activity-title">Math Quiz Graded</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📊</div>
+                        <div class="activity-details">
+                            <div class="activity-title">Attendance Updated</div>
+                            <div class="activity-time">4 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📅</div>
+                        <div class="activity-details">
+                        
+                            <div class="activity-time">Yesterday</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update the roster-content div -->
+            <div id="roster-content" class="dashboard-content" style="display: none;">
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="section-title">Class Roster</div>
+                    <div class="roster-container">
+                        <div class="class-selection">
+                            <label for="classSelect">Select Class:</label>
+                            <select id="classSelect" class="class-dropdown">
+                                <option value="grade1">Grade 1</option>
+                                <option value="grade2">Grade 2</option>
+                                <option value="grade3">Grade 3</option>
+                                <option value="grade4">Grade 4</option>
+                            </select>
+                        </div>
+                        <div class="student-list">
+                            <h3>Students</h3>
+                            <div class="student-container" id="rosterStudentList">
+                                <!-- Students will be added dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gradebook-content" class="dashboard-content" style="display: none;">
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="section-title">Gradebook</div>
+                    <div class="gradebook-container">
+                        <div class="class-list">
+                            <h3>Classes</h3>
+                            <div class="class-select">
+                                <div class="gradebook-class-item active">Grade 1</div>
+                                <div class="gradebook-class-item">Grade 2</div>
+                                <div class="gradebook-class-item">Grade 3</div>
+                            </div>
+                        </div>
+                        <div class="student-list">
+                            <h3>Students</h3>
+                            <div class="student-container">
+                                <!-- Students will be added dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="attendance-content" class="dashboard-content" style="display: none;">
+                <h2>Attendance Content</h2>
+            </div>
+
+            <div id="assignments-content" class="dashboard-content" style="display: none;">
+                <h2>Assignments Content</h2>
+            </div>
+
+            <div id="calendar-content" class="dashboard-content" style="display: none;">
+                <h2>Calendar Content</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grade Modal -->
+    <div id="gradeModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Grade for <span id="studentName"></span></h2>
+            <form id="gradeForm">
+                <div class="form-group">
+                    <label for="examType">Exam Type:</label>
+                    <select id="examType" required>
+                        <option value="quiz1">Quiz 1</option>
+                        <option value="midterm">Midterm</option>
+                        <option value="quiz2">Quiz 2</option>
+                        <option value="final">Final</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="grade">Grade:</label>
+                    <input type="number" id="grade" min="0" max="100" required>
+                </div>
+                <button type="submit" class="submit-btn">Save Grade</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
