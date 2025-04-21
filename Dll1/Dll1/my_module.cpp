@@ -943,6 +943,33 @@ public:
 			throw std::runtime_error("Edit student error: " + std::string(e.what()));
 		}
 	}
+	py::dict get_students_per_grade() {  // Return py::dict instead of py::list
+		try {
+			py::dict grades_dict;  // Dictionary to store results
+
+			nanodbc::statement stmt(conn_);
+			stmt.prepare(
+				"SELECT g.grade_name, COUNT(s.student_id) AS student_count "
+				"FROM grade g "
+				"LEFT JOIN students s ON g.grade_id = s.grade_id "
+				"GROUP BY g.grade_name "
+				"ORDER BY g.grade_name"
+			);
+
+			nanodbc::result result = stmt.execute();
+
+			while (result.next()) {
+				std::string grade_name = result.get<std::string>(0);
+				int student_count = result.get<int>(1);
+				grades_dict[grade_name.c_str()] = student_count;  // Add to dictionary
+			}
+
+			return grades_dict;
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Error fetching students per grade: " + std::string(e.what()));
+		}
+	}
 private:
 	nanodbc::connection conn_;
 };
@@ -964,7 +991,9 @@ PYBIND11_MODULE(my_module, m) {
 		.def("get_teachers", &OracleConnector::get_teachers)
 		.def("get_students", &OracleConnector::get_students)
 		.def("edit_teacher", &OracleConnector::edit_teacher)
-		.def("edit_student", &OracleConnector::edit_student);
+		.def("edit_student", &OracleConnector::edit_student)
+		.def("get_students_per_grade", &OracleConnector::get_students_per_grade);
+
 
 
 

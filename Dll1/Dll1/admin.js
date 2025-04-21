@@ -13,6 +13,10 @@ const classesElement = document.getElementById('classes');
 const studentsCountElement = document.getElementById('students-count');
 const staffCountElement = document.getElementById('staff-count');
 
+
+
+
+
 async function editStudentData(username, password, grade_name, class_name) {
     try {
         const response = await makeApiRequest(
@@ -64,49 +68,87 @@ async function editTeacherData(username, password, grade_name, class_name, subje
 const studentsTable = document.getElementById('students-table').querySelector('tbody');
 const staffTable = document.getElementById('staff-table').querySelector('tbody');
         // Initialize the pie chart
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('studentChart').getContext('2d');
-            const studentChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12', 'Grade 13'],
-                    datasets: [{
-                        data: [120, 150, 180, 200, 80],
-                        backgroundColor: [
-                            '#9b59b6',
-                            '#3498db',
-                            '#2ecc71',
-                            '#f1c40f',
-                            '#e74c3c'
-                        ],
-                        borderWidth: 1
-                    }]
+// Initialize the pie chart with dynamic data
+document.addEventListener('DOMContentLoaded', async function() {
+    const ctx = document.getElementById('studentChart').getContext('2d');
+    
+    // Fetch grade distribution data
+    const gradeData = await fetchGradeDistribution();
+    
+    // Default data in case API fails
+    let labels = ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12', 'Grade 13'];
+    let dataValues = [120, 150, 180, 200, 80];
+    
+    if (gradeData) {
+        // Extract labels and values from the API response
+        labels = Object.keys(gradeData);
+        dataValues = Object.values(gradeData);
+    }
+    
+    const studentChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataValues,
+                backgroundColor: [
+                    '#9b59b6',
+                    '#3498db',
+                    '#2ecc71',
+                    '#f1c40f',
+                    '#e74c3c',
+                    '#1abc9c', // Additional colors if there are more grades
+                    '#d35400'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: function(context) {
+                            // Dynamically set label color based on dark mode
+                            return document.body.classList.contains('dark-mode') ? '#e0e0e0' : '#333';
+                        }
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                color: '#ffff'
-                            }
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
                         }
                     }
                 }
-            });
+            }
+        }
+    });
 
-            // Update chart colors in dark mode
-            const darkModeToggle = document.querySelector('.dark-mode-toggle');
-            darkModeToggle.addEventListener('click', function() {
-                setTimeout(() => {
-                    const isDark = document.body.classList.contains('dark-mode');
-                    studentChart.options.plugins.legend.labels.color = isDark ? '#e0e0e0' : '#333';
-                    studentChart.update();
-                }, 0);
-            });
-        });
-
+    // Update chart when dark mode changes
+    const darkModeToggle = document.querySelector('.dark-mode-toggle');
+    darkModeToggle.addEventListener('click', function() {
+        setTimeout(() => {
+            studentChart.update();
+        }, 0);
+    });
+    
+    // Refresh chart data periodically (every 5 minutes)
+    setInterval(async () => {
+        const newGradeData = await fetchGradeDistribution();
+        if (newGradeData) {
+            studentChart.data.labels = Object.keys(newGradeData);
+            studentChart.data.datasets[0].data = Object.values(newGradeData);
+            studentChart.update();
+        }
+    }, 300000); // 300000 ms = 5 minutes
+});
 // API Helper Function
 async function makeApiRequest(method, endpoint, data = null) {
     const options = {
@@ -152,6 +194,16 @@ async function fetchStudents() {
     } catch (error) {
         console.error("Error fetching students:", error);
         return false;
+    }
+}
+
+async function fetchGradeDistribution() {
+    try {
+        const response = await makeApiRequest('GET', '/count/grades');
+        return response;
+    } catch (error) {
+        console.error("Error fetching grade distribution:", error);
+        return null;
     }
 }
 

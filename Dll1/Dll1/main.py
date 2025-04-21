@@ -104,6 +104,10 @@ def editStudent(username, password, grade_name, class_name):
 	conn.edit_student(username, password, grade_name, class_name)
 	return {"Message" : "Student updated successfully"} , 200
 
+@app.route('/count/grades' , methods= ['GET'])
+def countgrades():
+	return conn.get_students_per_grade() , 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
