@@ -12,6 +12,8 @@ DROP TABLE classes CASCADE CONSTRAINTS;
 DROP TABLE grade CASCADE CONSTRAINTS;
 DROP TABLE users CASCADE CONSTRAINTS;
 
+select * from subjects;
+select * from degree_with_subject;
 
 -- Recreate tables with proper constraints
 CREATE TABLE users(
@@ -188,13 +190,13 @@ INSERT INTO student_with_subject (student_id, subject_id) VALUES (8, 7);
 INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
 VALUES (1, TO_DATE('2023-10-15', 'YYYY-MM-DD'), 85, 1);
 INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
-VALUES (1, TO_DATE('2023-10-15', 'YYYY-MM-DD'), 92, 2);
+VALUES (2, TO_DATE('2023-10-15', 'YYYY-MM-DD'), 92, 2);
 
 -- Grades for Computer Science (subject_id = 7)
 INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
 VALUES (7, TO_DATE('2023-10-18', 'YYYY-MM-DD'), 88, 7);
 INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
-VALUES (7, TO_DATE('2023-10-18', 'YYYY-MM-DD'), 95, 8);
+VALUES (7, TO_DATE('2023-10-19', 'YYYY-MM-DD'), 95, 8);
 
 -- Assign Teachers to Students (advisors)
 INSERT INTO teacher_with_student (teacher_id, student_id) VALUES (1, 1); 

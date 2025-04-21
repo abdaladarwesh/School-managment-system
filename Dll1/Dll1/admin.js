@@ -13,6 +13,25 @@ const classesElement = document.getElementById('classes');
 const studentsCountElement = document.getElementById('students-count');
 const staffCountElement = document.getElementById('staff-count');
 
+async function editStudentData(username, password, grade_name, class_name) {
+    try {
+        const response = await makeApiRequest(
+            'PUT', 
+            `/student/edit/${encodeURIComponent(username)}/${encodeURIComponent(password)}/${encodeURIComponent(grade_name)}/${encodeURIComponent(class_name)}`
+        );
+        
+        if (response?.Message === "Student updated successfully" || response?.Message === "done") {
+            await fetchStudents(); // Refresh student list
+            alert(`Student ${username} updated successfully!`);
+            return true;
+        }
+    throw new Error('Failed to update student');
+} catch (error) {
+    alert(`Error updating student: ${error.message}`);
+    return false;
+}
+}
+
 // Display current user
 function displayCurrentUser() {
     const userData = JSON.parse(localStorage.getItem('currentUser'));
@@ -21,6 +40,25 @@ function displayCurrentUser() {
     }
 }
 
+// Add this function to handle teacher editing
+async function editTeacherData(username, password, grade_name, class_name, subject) {
+    try {
+        const response = await makeApiRequest(
+            'PUT', 
+            `/teacher/edit/${encodeURIComponent(username)}/${encodeURIComponent(password)}/${encodeURIComponent(grade_name)}/${encodeURIComponent(class_name)}/${encodeURIComponent(subject)}`
+        );
+        
+        if (response?.Message === "Teacher updated successfully" || response?.Message === "done") {
+            await fetchStaff(); // Refresh staff list
+            alert(`Staff member ${username} updated successfully!`);
+            return true;
+        }
+    throw new Error('Failed to update staff member');
+} catch (error) {
+    alert(`Error updating staff: ${error.message}`);
+    return false;
+}
+}
 
 // Tables
 const studentsTable = document.getElementById('students-table').querySelector('tbody');
@@ -283,28 +321,39 @@ function editStudent(username) {
     const student = students.find(s => s.username === username);
     if (student) {
         document.getElementById('student-name').value = student.username;
-        document.getElementById('student-password').value = '';
+        document.getElementById('student-password').value = ''; // Password field emptied for security
         document.getElementById('student-grade').value = student.grade;
         document.getElementById('student-class').value = student.class;
+        
+        // Set form to edit mode
+        document.getElementById('student-form-mode').value = 'edit';
+        
+        // Change the button text to indicate editing
+        document.querySelector('#student-form .submit-btn').textContent = 'Update Student';
         
         document.getElementById('add-student-form').style.display = 'block';
         document.getElementById('remove-student-form').style.display = 'none';
     }
 }
-
 function editStaff(username) {
     const staffMember = staff.find(s => s.username === username);
     if (staffMember) {
         document.getElementById('staff-name').value = staffMember.username;
-        document.getElementById('staff-password').value = '';
-        document.getElementById('staff-position').value = staffMember.position;
-        document.getElementById('staff-department').value = staffMember.department;
+        document.getElementById('staff-password').value = ''; // Password field emptied for security
+        document.getElementById('staff-position').value = staffMember.grades || '';
+        document.getElementById('staff-class').value = staffMember.classes || '';
+        document.getElementById('staff-department').value = staffMember.subjects || '';
+        
+        // Set form to edit mode
+        document.getElementById('staff-form-mode').value = 'edit';
+        
+        // Change the button text to indicate editing
+        document.querySelector('#staff-form .submit-btn').textContent = 'Update Staff';
         
         document.getElementById('add-staff-form').style.display = 'block';
         document.getElementById('remove-staff-form').style.display = 'none';
     }
 }
-
 // Form Handlers
 document.getElementById('student-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -313,19 +362,20 @@ document.getElementById('student-form').addEventListener('submit', async functio
     const grade = document.getElementById('student-grade').value;
     const studentClass = document.getElementById('student-class').value;
     
-    if (await addStudent(name, password, grade, studentClass)) {
+    // Check if we're editing or adding
+    const isEditing = document.getElementById('student-form-mode').value === 'edit';
+    
+    let success = false;
+    if (isEditing) {
+        success = await editStudentData(name, password, grade, studentClass);
+    } else {
+        success = await addStudent(name, password, grade, studentClass);
+    }
+    
+    if (success) {
         this.reset();
         document.getElementById('add-student-form').style.display = 'none';
-    }
-});
-
-document.getElementById('remove-student-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const name = document.getElementById('remove-student-name').value;
-    
-    if (await deleteStudent(name)) {
-        this.reset();
-        document.getElementById('remove-student-form').style.display = 'none';
+        document.getElementById('student-form-mode').value = 'add'; // Reset mode
     }
 });
 
@@ -337,13 +387,22 @@ document.getElementById('staff-form').addEventListener('submit', async function(
     const class_name = document.getElementById('staff-class').value;
     const department = document.getElementById('staff-department').value;
     
+    // Check if we're editing or adding
+    const isEditing = document.getElementById('staff-form-mode').value === 'edit';
     
-    if (await addStaff(name, password, position,  class_name,department)) {
+    let success = false;
+    if (isEditing) {
+        success = await editTeacherData(name, password, position, class_name, department);
+    } else {
+        success = await addStaff(name, password, position, class_name, department);
+    }
+    
+    if (success) {
         this.reset();
         document.getElementById('add-staff-form').style.display = 'none';
+        document.getElementById('staff-form-mode').value = 'add'; // Reset mode
     }
 });
-
 document.getElementById('remove-staff-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const name = document.getElementById('remove-staff-name').value;
@@ -381,8 +440,9 @@ document.getElementById('add-student-btn').addEventListener('click', function() 
     document.getElementById('add-student-form').style.display = 'block';
     document.getElementById('remove-student-form').style.display = 'none';
     document.getElementById('student-form').reset();
+    document.getElementById('student-form-mode').value = 'add'; // Reset mode to add
+    document.querySelector('#student-form .submit-btn').textContent = 'Add Student'; // Reset button text
 });
-
 document.getElementById('remove-student-btn').addEventListener('click', function() {
     document.getElementById('remove-student-form').style.display = 'block';
     document.getElementById('add-student-form').style.display = 'none';

@@ -94,7 +94,15 @@ def teachercount():
 def classcount():
     return {"count" : conn.count_classes()}
 
+@app.route('/teacher/edit/<string:username>/<string:password>/<string:grade_name>/<string:class_name>/<string:subject_name>' , methods= ['PUT'])
+def editTeacher(username, password, grade_name, class_name, subject_name):
+	conn.edit_teacher(username, password, grade_name, class_name, subject_name)
+	return {"Message" : "Teacher updated successfully"} , 200
 
+@app.route('/student/edit/<string:username>/<string:password>/<string:grade_name>/<string:class_name>' , methods= ['PUT'])
+def editStudent(username, password, grade_name, class_name):
+	conn.edit_student(username, password, grade_name, class_name)
+	return {"Message" : "Student updated successfully"} , 200
 
 
 if __name__ == "__main__":

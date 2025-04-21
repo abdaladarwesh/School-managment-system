@@ -550,7 +550,8 @@
                         <form id="student-form">
                             <div class="form-group">
                                 <label for="student-name">Student Name:</label>
-                                <input type="text" id="student-name" required>
+                                <input type="hidden" id="student-form-mode" value="add">
+                                <input type="text" id="student-name" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="student-password">Password:</label>
@@ -624,7 +625,8 @@
                         <form id="staff-form">
                             <div class="form-group">
                                 <label for="staff-name">Staff Name:</label>
-                                <input type="text" id="staff-name" required>
+                                <input type="hidden" id="staff-form-mode" value="add">
+                                <input type="text" id="staff-name" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="staff-password">Password:</label>

@@ -606,6 +606,343 @@ public:
 			throw std::runtime_error("Get teachers error: " + std::string(e.what()));
 		}
 	}
+	void edit_teacher(const std::string& username, const std::string& password,
+		const std::string& grade_name, const std::string& class_name,
+		const std::string& subject_name) {
+		try {
+			// Start transaction
+			nanodbc::transaction transaction(conn_);
+
+			// 1. Get the user_id for the teacher
+			int user_id = 0;
+			{
+				nanodbc::statement id_stmt(conn_);
+				id_stmt.prepare("SELECT user_id FROM users WHERE username = ?");
+				id_stmt.bind(0, username.c_str());
+				nanodbc::result id_result = id_stmt.execute();
+
+				if (!id_result.next()) {
+					throw std::runtime_error("Teacher not found with username: " + username);
+				}
+				user_id = id_result.get<int>(0);
+			}
+
+			// 2. Update password if provided
+			if (!password.empty()) {
+				nanodbc::statement pwd_stmt(conn_);
+				pwd_stmt.prepare("UPDATE users SET password = ? WHERE user_id = ?");
+				pwd_stmt.bind(0, password.c_str());
+				pwd_stmt.bind(1, &user_id);
+				pwd_stmt.execute();
+			}
+
+			// 3. Get teacher_id
+			int teacher_id = 0;
+			{
+				nanodbc::statement tid_stmt(conn_);
+				tid_stmt.prepare("SELECT teacher_id FROM teachers WHERE user_id = ?");
+				tid_stmt.bind(0, &user_id);
+				nanodbc::result tid_result = tid_stmt.execute();
+
+				if (!tid_result.next()) {
+					throw std::runtime_error("Teacher record not found for user: " + username);
+				}
+				teacher_id = tid_result.get<int>(0);
+			}
+
+			// 4. Handle grade if provided
+			if (!grade_name.empty()) {
+				int grade_id = 0;
+				// Try to find existing grade
+				nanodbc::statement find_grade(conn_);
+				find_grade.prepare("SELECT grade_id FROM grade WHERE grade_name = ?");
+				find_grade.bind(0, grade_name.c_str());
+				nanodbc::result grade_result = find_grade.execute();
+
+				if (grade_result.next()) {
+					grade_id = grade_result.get<int>(0);
+				}
+				else {
+					// Insert new grade
+					nanodbc::statement insert_grade(conn_);
+					insert_grade.prepare("INSERT INTO grade (grade_name) VALUES (?)");
+					insert_grade.bind(0, grade_name.c_str());
+					insert_grade.execute();
+
+					// Get the new grade_id
+					nanodbc::statement get_grade_id(conn_);
+					get_grade_id.prepare("SELECT grade_id FROM grade WHERE grade_name = ?");
+					get_grade_id.bind(0, grade_name.c_str());
+					nanodbc::result new_grade_result = get_grade_id.execute();
+
+					if (!new_grade_result.next()) {
+						throw std::runtime_error("Failed to retrieve new grade ID");
+					}
+					grade_id = new_grade_result.get<int>(0);
+				}
+
+				// Check if teacher already has a grade assignment
+				nanodbc::statement check_grade(conn_);
+				check_grade.prepare("SELECT COUNT(*) FROM teacher_with_grade WHERE teacher_id = ?");
+				check_grade.bind(0, &teacher_id);
+				nanodbc::result check_result = check_grade.execute();
+				check_result.next();
+				int grade_count = check_result.get<int>(0);
+
+				if (grade_count > 0) {
+					// Update existing grade assignment
+					nanodbc::statement update_grade(conn_);
+					update_grade.prepare("UPDATE teacher_with_grade SET grade_id = ? WHERE teacher_id = ?");
+					update_grade.bind(0, &grade_id);
+					update_grade.bind(1, &teacher_id);
+					update_grade.execute();
+				}
+				else {
+					// Insert new grade assignment
+					nanodbc::statement teacher_grade(conn_);
+					teacher_grade.prepare("INSERT INTO teacher_with_grade (teacher_id, grade_id) VALUES (?, ?)");
+					teacher_grade.bind(0, &teacher_id);
+					teacher_grade.bind(1, &grade_id);
+					teacher_grade.execute();
+				}
+			}
+
+			// 5. Handle class if provided
+			if (!class_name.empty()) {
+				int class_id = 0;
+				// Try to find existing class
+				nanodbc::statement find_class(conn_);
+				find_class.prepare("SELECT class_id FROM classes WHERE name = ?");
+				find_class.bind(0, class_name.c_str());
+				nanodbc::result class_result = find_class.execute();
+
+				if (class_result.next()) {
+					class_id = class_result.get<int>(0);
+				}
+				else {
+					// Insert new class
+					nanodbc::statement insert_class(conn_);
+					insert_class.prepare("INSERT INTO classes (name) VALUES (?)");
+					insert_class.bind(0, class_name.c_str());
+					insert_class.execute();
+
+					// Get the new class_id
+					nanodbc::statement get_class_id(conn_);
+					get_class_id.prepare("SELECT class_id FROM classes WHERE name = ?");
+					get_class_id.bind(0, class_name.c_str());
+					nanodbc::result new_class_result = get_class_id.execute();
+
+					if (!new_class_result.next()) {
+						throw std::runtime_error("Failed to retrieve new class ID");
+					}
+					class_id = new_class_result.get<int>(0);
+				}
+
+				// Check if teacher already has a class assignment
+				nanodbc::statement check_class(conn_);
+				check_class.prepare("SELECT COUNT(*) FROM class_with_teacher WHERE teacher_id = ?");
+				check_class.bind(0, &teacher_id);
+				nanodbc::result check_result = check_class.execute();
+				check_result.next();
+				int class_count = check_result.get<int>(0);
+
+				if (class_count > 0) {
+					// Update existing class assignment
+					nanodbc::statement update_class(conn_);
+					update_class.prepare("UPDATE class_with_teacher SET class_id = ? WHERE teacher_id = ?");
+					update_class.bind(0, &class_id);
+					update_class.bind(1, &teacher_id);
+					update_class.execute();
+				}
+				else {
+					// Insert new class assignment
+					nanodbc::statement teacher_class(conn_);
+					teacher_class.prepare("INSERT INTO class_with_teacher (teacher_id, class_id) VALUES (?, ?)");
+					teacher_class.bind(0, &teacher_id);
+					teacher_class.bind(1, &class_id);
+					teacher_class.execute();
+				}
+			}
+
+			// 6. Handle subject if provided
+			if (!subject_name.empty()) {
+				// Check if subject already exists
+				nanodbc::statement find_subject(conn_);
+				find_subject.prepare("SELECT sub_id FROM subjects WHERE sub_name = ?");
+				find_subject.bind(0, subject_name.c_str());
+				nanodbc::result subject_result = find_subject.execute();
+
+				if (subject_result.next()) {
+					// Update existing subject to assign to this teacher
+					int sub_id = subject_result.get<int>(0);
+					nanodbc::statement update_subject(conn_);
+					update_subject.prepare("UPDATE subjects SET teacher_id = ? WHERE sub_id = ?");
+					update_subject.bind(0, &teacher_id);
+					update_subject.bind(1, &sub_id);
+					update_subject.execute();
+				}
+				else {
+					// Check if teacher already has a subject
+					nanodbc::statement check_subject(conn_);
+					check_subject.prepare("SELECT sub_id FROM subjects WHERE teacher_id = ?");
+					check_subject.bind(0, &teacher_id);
+					nanodbc::result check_result = check_subject.execute();
+
+					if (check_result.next()) {
+						// Update existing subject name
+						int sub_id = check_result.get<int>(0);
+						nanodbc::statement update_subject_name(conn_);
+						update_subject_name.prepare("UPDATE subjects SET sub_name = ? WHERE sub_id = ?");
+						update_subject_name.bind(0, subject_name.c_str());
+						update_subject_name.bind(1, &sub_id);
+						update_subject_name.execute();
+					}
+					else {
+						// Insert new subject
+						nanodbc::statement insert_subject(conn_);
+						insert_subject.prepare("INSERT INTO subjects (sub_name, teacher_id) VALUES (?, ?)");
+						insert_subject.bind(0, subject_name.c_str());
+						insert_subject.bind(1, &teacher_id);
+						insert_subject.execute();
+					}
+				}
+			}
+
+			// Commit transaction if everything succeeded
+			transaction.commit();
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Edit teacher error: " + std::string(e.what()));
+		}
+	}
+	void edit_student(const std::string& username, const std::string& password,
+		const std::string& grade_name, const std::string& class_name) {
+		try {
+			// Start transaction
+			nanodbc::transaction transaction(conn_);
+
+			// 1. Get the user_id for the student
+			int user_id = 0;
+			{
+				nanodbc::statement id_stmt(conn_);
+				id_stmt.prepare("SELECT user_id FROM users WHERE username = ?");
+				id_stmt.bind(0, username.c_str());
+				nanodbc::result id_result = id_stmt.execute();
+
+				if (!id_result.next()) {
+					throw std::runtime_error("Student not found with username: " + username);
+				}
+				user_id = id_result.get<int>(0);
+			}
+
+			// 2. Update password if provided
+			if (!password.empty()) {
+				nanodbc::statement pwd_stmt(conn_);
+				pwd_stmt.prepare("UPDATE users SET password = ? WHERE user_id = ?");
+				pwd_stmt.bind(0, password.c_str());
+				pwd_stmt.bind(1, &user_id);
+				pwd_stmt.execute();
+			}
+
+			// 3. Get student record
+			int student_id = 0;
+			{
+				nanodbc::statement student_stmt(conn_);
+				student_stmt.prepare("SELECT student_id FROM students WHERE user_id = ?");
+				student_stmt.bind(0, &user_id);
+				nanodbc::result student_result = student_stmt.execute();
+
+				if (!student_result.next()) {
+					throw std::runtime_error("Student record not found for user: " + username);
+				}
+				student_id = student_result.get<int>(0);
+			}
+
+			// 4. Handle grade if provided
+			if (!grade_name.empty()) {
+				int grade_id = 0;
+				// Try to find existing grade
+				nanodbc::statement find_grade(conn_);
+				find_grade.prepare("SELECT grade_id FROM grade WHERE grade_name = ?");
+				find_grade.bind(0, grade_name.c_str());
+				nanodbc::result grade_result = find_grade.execute();
+
+				if (grade_result.next()) {
+					grade_id = grade_result.get<int>(0);
+				}
+				else {
+					// Insert new grade
+					nanodbc::statement insert_grade(conn_);
+					insert_grade.prepare("INSERT INTO grade (grade_name) VALUES (?)");
+					insert_grade.bind(0, grade_name.c_str());
+					insert_grade.execute();
+
+					// Get the new grade_id
+					nanodbc::statement get_grade_id(conn_);
+					get_grade_id.prepare("SELECT grade_id FROM grade WHERE grade_name = ?");
+					get_grade_id.bind(0, grade_name.c_str());
+					nanodbc::result new_grade_result = get_grade_id.execute();
+
+					if (!new_grade_result.next()) {
+						throw std::runtime_error("Failed to retrieve new grade ID");
+					}
+					grade_id = new_grade_result.get<int>(0);
+				}
+
+				// Update student's grade
+				nanodbc::statement update_grade(conn_);
+				update_grade.prepare("UPDATE students SET grade_id = ? WHERE user_id = ?");
+				update_grade.bind(0, &grade_id);
+				update_grade.bind(1, &user_id);
+				update_grade.execute();
+			}
+
+			// 5. Handle class if provided
+			if (!class_name.empty()) {
+				int class_id = 0;
+				// Try to find existing class
+				nanodbc::statement find_class(conn_);
+				find_class.prepare("SELECT class_id FROM classes WHERE name = ?");
+				find_class.bind(0, class_name.c_str());
+				nanodbc::result class_result = find_class.execute();
+
+				if (class_result.next()) {
+					class_id = class_result.get<int>(0);
+				}
+				else {
+					// Insert new class
+					nanodbc::statement insert_class(conn_);
+					insert_class.prepare("INSERT INTO classes (name) VALUES (?)");
+					insert_class.bind(0, class_name.c_str());
+					insert_class.execute();
+
+					// Get the new class_id
+					nanodbc::statement get_class_id(conn_);
+					get_class_id.prepare("SELECT class_id FROM classes WHERE name = ?");
+					get_class_id.bind(0, class_name.c_str());
+					nanodbc::result new_class_result = get_class_id.execute();
+
+					if (!new_class_result.next()) {
+						throw std::runtime_error("Failed to retrieve new class ID");
+					}
+					class_id = new_class_result.get<int>(0);
+				}
+
+				// Update student's class
+				nanodbc::statement update_class(conn_);
+				update_class.prepare("UPDATE students SET class_id = ? WHERE user_id = ?");
+				update_class.bind(0, &class_id);
+				update_class.bind(1, &user_id);
+				update_class.execute();
+			}
+
+			// Commit transaction if everything succeeded
+			transaction.commit();
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Edit student error: " + std::string(e.what()));
+		}
+	}
 private:
 	nanodbc::connection conn_;
 };
@@ -625,7 +962,11 @@ PYBIND11_MODULE(my_module, m) {
 		.def("add_teacher", &OracleConnector::add_teacher)
 		.def("remove_teacher", &OracleConnector::remove_teacher)
 		.def("get_teachers", &OracleConnector::get_teachers)
-		.def("get_students", &OracleConnector::get_students);
+		.def("get_students", &OracleConnector::get_students)
+		.def("edit_teacher", &OracleConnector::edit_teacher)
+		.def("edit_student", &OracleConnector::edit_student);
+
+
 
 		
 
