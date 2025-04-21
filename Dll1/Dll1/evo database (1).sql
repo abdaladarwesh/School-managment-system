@@ -12,8 +12,13 @@ DROP TABLE classes CASCADE CONSTRAINTS;
 DROP TABLE grade CASCADE CONSTRAINTS;
 DROP TABLE users CASCADE CONSTRAINTS;
 
-select * from subjects;
+SELECT username FROM users 
+WHERE user_id = (SELECT user_id FROM students WHERE student_id = 1);
 select * from degree_with_subject;
+select * from users where user_id = (select user_id from students where student_id = 1);
+select * from students;
+
+
 
 -- Recreate tables with proper constraints
 CREATE TABLE users(
@@ -59,7 +64,9 @@ CREATE TABLE degree_with_subject(
     sub_id NUMBER,
     degree_date DATE,
     degree NUMBER NOT NULL,
+    assignment VARCHAR2(255) DEFAULT 'Quiz' NOT NULL,
     student_id NUMBER,
+    teacher_comment VARCHAR2(255) ,
     PRIMARY KEY (sub_id, degree_date),
     CONSTRAINT degree_subject_fk FOREIGN KEY (sub_id) REFERENCES subjects(sub_id) ON DELETE CASCADE,
     CONSTRAINT degree_student_fk FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
@@ -118,9 +125,14 @@ INSERT INTO classes (name) VALUES ('Technology B');
 -- Insert Users (Admins)
 INSERT INTO users (username, password) VALUES ('admin1', 'admin123');
 INSERT INTO users (username, password) VALUES ('admin2', 'admin456');
+INSERT INTO users (username, password) VALUES ('abdullah', '123');
+
+
+
 
 INSERT INTO admins (user_id) VALUES (1);
 INSERT INTO admins (user_id) VALUES (2);
+INSERT INTO admins (user_id) select user_id from users where username = 'abdullah';
 
 -- Insert Users (Teachers)
 INSERT INTO users (username, password) VALUES ('john.smith', 'teacher1');
@@ -187,17 +199,96 @@ INSERT INTO student_with_subject (student_id, subject_id) VALUES (8, 7);
 
 -- Insert Grades for Students
 -- Grades for Mathematics (subject_id = 1)
+-- Mathematics grades (subject_id = 1)
 INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
-VALUES (1, TO_DATE('2023-10-15', 'YYYY-MM-DD'), 85, 1);
-INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
-VALUES (2, TO_DATE('2023-10-15', 'YYYY-MM-DD'), 92, 2);
+VALUES (1, TO_DATE('15-01-2025', 'DD-MM-YYYY'), 78, 1);
 
--- Grades for Computer Science (subject_id = 7)
 INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
-VALUES (7, TO_DATE('2023-10-18', 'YYYY-MM-DD'), 88, 7);
-INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
-VALUES (7, TO_DATE('2023-10-19', 'YYYY-MM-DD'), 95, 8);
+VALUES (2, TO_DATE('16-01-2025', 'DD-MM-YYYY'), 88, 1);
 
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (3, TO_DATE('17-01-2025', 'DD-MM-YYYY'), 90, 1);
+
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (4, TO_DATE('18-01-2025', 'DD-MM-YYYY'), 55, 1);
+
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (5, TO_DATE('18-01-2025', 'DD-MM-YYYY'), 89, 1);
+
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (6, TO_DATE('18-01-2025', 'DD-MM-YYYY'), 64, 1);
+
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (7, TO_DATE('18-01-2025', 'DD-MM-YYYY'), 93, 1);
+
+
+
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (1, TO_DATE('20-02-2025', 'DD-MM-YYYY'), 82, 1);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (1, TO_DATE('10-03-2025', 'DD-MM-YYYY'), 85, 2);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (1, TO_DATE('25-04-2025', 'DD-MM-YYYY'), 90, 2);
+
+-- Physics grades (subject_id = 2)
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (2, TO_DATE('18-01-2025', 'DD-MM-YYYY'), 88, 1);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (2, TO_DATE('22-02-2025', 'DD-MM-YYYY'), 92, 1);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (2, TO_DATE('12-03-2025', 'DD-MM-YYYY'), 85, 2);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (2, TO_DATE('28-04-2025', 'DD-MM-YYYY'), 94, 2);
+
+-- Chemistry grades (subject_id = 3)
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (3, TO_DATE('16-01-2025', 'DD-MM-YYYY'), 75, 3);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (3, TO_DATE('21-02-2025', 'DD-MM-YYYY'), 80, 3);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (3, TO_DATE('11-03-2025', 'DD-MM-YYYY'), 82, 4);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (3, TO_DATE('26-04-2025', 'DD-MM-YYYY'), 87, 4);
+
+-- Biology grades (subject_id = 4)
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (4, TO_DATE('17-01-2025', 'DD-MM-YYYY'), 92, 3);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (4, TO_DATE('23-02-2025', 'DD-MM-YYYY'), 88, 3);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (4, TO_DATE('13-03-2025', 'DD-MM-YYYY'), 95, 4);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (4, TO_DATE('29-04-2025', 'DD-MM-YYYY'), 90, 4);
+
+-- Computer Science grades (subject_id = 7)
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (7, TO_DATE('19-01-2025', 'DD-MM-YYYY'), 85, 7);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (7, TO_DATE('24-02-2025', 'DD-MM-YYYY'), 92, 7);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (7, TO_DATE('14-03-2025', 'DD-MM-YYYY'), 88, 8);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (7, TO_DATE('30-04-2025', 'DD-MM-YYYY'), 95, 8);
+
+-- Literature grades (subject_id = 5)
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (5, TO_DATE('20-01-2025', 'DD-MM-YYYY'), 78, 5);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (5, TO_DATE('25-02-2025', 'DD-MM-YYYY'), 82, 5);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (5, TO_DATE('15-03-2025', 'DD-MM-YYYY'), 85, 6);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (5, TO_DATE('01-05-2025', 'DD-MM-YYYY'), 90, 6);
+
+-- History grades (subject_id = 6)
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (6, TO_DATE('21-01-2025', 'DD-MM-YYYY'), 88, 5);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (6, TO_DATE('26-02-2025', 'DD-MM-YYYY'), 92, 5);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (6, TO_DATE('16-03-2025', 'DD-MM-YYYY'), 85, 6);
+INSERT INTO degree_with_subject (sub_id, degree_date, degree, student_id) 
+VALUES (6, TO_DATE('02-05-2025', 'DD-MM-YYYY'), 94, 6);
 -- Assign Teachers to Students (advisors)
 INSERT INTO teacher_with_student (teacher_id, student_id) VALUES (1, 1); 
 INSERT INTO teacher_with_student (teacher_id, student_id) VALUES (1, 2); 
@@ -221,3 +312,27 @@ DROP TABLE grade CASCADE CONSTRAINTS;
 DROP TABLE users CASCADE CONSTRAINTS;
 
 -- Then run your original table creation script again
+
+
+				SELECT s.sub_name, d.degree 
+				FROM (
+				   SELECT d.sub_id, d.degree, 
+				          ROW_NUMBER() OVER (PARTITION BY d.sub_id ORDER BY d.degree_date DESC) as rn 
+				   FROM degree_with_subject d 
+				   WHERE d.student_id = 1
+				) d 
+				JOIN subjects s ON d.sub_id = s.sub_id 
+				WHERE d.rn = 1 
+				ORDER BY s.sub_name;
+				
+SELECT s.sub_name, AVG(d.degree) as degree
+FROM (
+    SELECT d.sub_id, d.degree, 
+           ROW_NUMBER() OVER (PARTITION BY d.sub_id ORDER BY d.degree_date DESC) as rn 
+    FROM degree_with_subject d 
+    WHERE d.student_id = 1
+) d 
+JOIN subjects s ON d.sub_id = s.sub_id 
+WHERE d.rn = 1 
+GROUP BY s.sub_name
+ORDER BY s.sub_name

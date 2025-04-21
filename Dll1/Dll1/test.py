@@ -5,7 +5,7 @@ conn = my_module.connect()
 
 
 
-teachers = conn.get_students_per_grade()
+teachers = conn.get_latest_subject_degrees("emily.davis")
 
 
 

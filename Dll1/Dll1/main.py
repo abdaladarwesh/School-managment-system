@@ -108,6 +108,18 @@ def editStudent(username, password, grade_name, class_name):
 def countgrades():
 	return conn.get_students_per_grade() , 200
 
+@app.route('/latest/grades/<string:username>' , methods= ['GET'])
+def latestgrades(username):
+	return conn.get_latest_subject_degrees(username) , 200
+
+@app.route('/avg/grades/<string:username>' , methods= ['GET'])
+def avggrades(username):
+	return conn.get_latest_avg_degrees(username) , 200
+@app.route('/grades/<string:username>' , methods= ['GET'])
+def getgrades(username):
+	return conn.get_degrees(username) , 200
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

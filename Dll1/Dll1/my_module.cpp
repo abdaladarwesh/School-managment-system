@@ -970,6 +970,181 @@ public:
 			throw std::runtime_error("Error fetching students per grade: " + std::string(e.what()));
 		}
 	}
+	py::dict get_latest_subject_degrees(const std::string& username) {
+		try {
+			py::dict degrees_dict;
+
+			// First get the student_id from username
+			int student_id = 0;
+			{
+				nanodbc::statement id_stmt(conn_);
+				id_stmt.prepare(
+					"SELECT s.student_id FROM students s "
+					"JOIN users u ON s.user_id = u.user_id "
+					"WHERE u.username = ?"
+				);
+				id_stmt.bind(0, username.c_str());
+				nanodbc::result id_result = id_stmt.execute();
+
+				if (!id_result.next()) {
+					throw std::runtime_error("Student not found with username: " + username);
+				}
+				student_id = id_result.get<int>(0);
+			}
+
+			// Get the latest degree for each subject (up to 4 subjects)
+			nanodbc::statement stmt(conn_);
+			stmt.prepare(
+				"SELECT s.sub_name, d.degree "
+				"FROM ("
+				"   SELECT d.sub_id, d.degree, "
+				"          ROW_NUMBER() OVER (PARTITION BY d.sub_id ORDER BY d.degree_date DESC) as rn "
+				"   FROM degree_with_subject d "
+				"   WHERE d.student_id = ?"
+				") d "
+				"JOIN subjects s ON d.sub_id = s.sub_id "
+				"WHERE d.rn = 1 "
+				"ORDER BY s.sub_name"
+			);
+			stmt.bind(0, &student_id);
+
+			nanodbc::result result = stmt.execute();
+
+			while (result.next()) {
+				std::string subject_name = result.get<std::string>(0);
+				int degree = result.get<int>(1);
+				degrees_dict[subject_name.c_str()] = degree;
+			}
+
+			return degrees_dict;
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Error fetching latest subject degrees: " + std::string(e.what()));
+		}
+	}
+	py::dict get_latest_avg_degrees(const std::string& username) {
+		try {
+			py::dict degrees_dict;
+
+			// First get the student_id from username
+			int student_id = 0;
+			{
+				nanodbc::statement id_stmt(conn_);
+				id_stmt.prepare(
+					"SELECT s.student_id FROM students s "
+					"JOIN users u ON s.user_id = u.user_id "
+					"WHERE u.username = ?"
+				);
+				id_stmt.bind(0, username.c_str());
+				nanodbc::result id_result = id_stmt.execute();
+
+				if (!id_result.next()) {
+					throw std::runtime_error("Student not found with username: " + username);
+				}
+				student_id = id_result.get<int>(0);
+			}
+
+			nanodbc::statement stmt(conn_);
+			stmt.prepare(
+				"SELECT s.sub_name, AVG(d.degree) as average_degree FROM degree_with_subject d JOIN subjects s ON d.sub_id = s.sub_id WHERE d.student_id = ? GROUP BY s.sub_id, s.sub_name");
+			stmt.bind(0, &student_id);
+
+			nanodbc::result result = stmt.execute();
+
+			while (result.next()) {
+				std::string subject_name = result.get<std::string>(0);
+				int degree = result.get<int>(1);
+				degrees_dict[subject_name.c_str()] = degree;
+			}
+
+			return degrees_dict;
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Error fetching latest subject degrees: " + std::string(e.what()));
+		}
+	}
+	py::dict get_degrees(const std::string& username) {
+		try {
+			py::dict degrees_dict;
+
+			// First get the student_id from username
+			int student_id = 0;
+			{
+				nanodbc::statement id_stmt(conn_);
+				id_stmt.prepare(
+					"SELECT s.student_id FROM students s "
+					"JOIN users u ON s.user_id = u.user_id "
+					"WHERE u.username = ?"
+				);
+				id_stmt.bind(0, username.c_str());
+				nanodbc::result id_result = id_stmt.execute();
+
+				if (!id_result.next()) {
+					throw std::runtime_error("Student not found with username: " + username);
+				}
+				student_id = id_result.get<int>(0);
+			}
+
+			// Get all degrees for the student with subject information
+			nanodbc::statement stmt(conn_);
+			stmt.prepare(
+				"SELECT s.sub_name, d.degree_date, d.degree, d.assignment, d.teacher_comment "
+				"FROM degree_with_subject d "
+				"JOIN subjects s ON d.sub_id = s.sub_id "
+				"WHERE d.student_id = ? "
+				"ORDER BY s.sub_name, d.degree_date DESC"
+			);
+			stmt.bind(0, &student_id);
+
+			nanodbc::result result = stmt.execute();
+
+			std::string current_subject;
+			py::list subject_degrees;
+
+			while (result.next()) {
+				std::string subject_name = result.get<std::string>(0);
+				std::string degree_date = result.get<std::string>(1);
+				int degree = result.get<int>(2);
+				std::string assignment = result.get<std::string>(3);
+
+				// Handle possible NULL comment
+				std::string comment = "";
+				if (!result.is_null(4)) {
+					comment = result.get<std::string>(4);
+				}
+
+				// Create a dictionary for this degree record
+				py::dict degree_info;
+				degree_info["date"] = degree_date;
+				degree_info["degree"] = degree;
+				degree_info["assignment"] = assignment;
+				degree_info["comment"] = comment;
+
+				// If this is a new subject, add the previous subject's degrees to the dict
+				if (subject_name != current_subject) {
+					if (!current_subject.empty()) {
+						degrees_dict[current_subject.c_str()] = subject_degrees;
+					}
+					current_subject = subject_name;
+					subject_degrees = py::list();
+				}
+
+				// Add this degree to the current subject's list
+				subject_degrees.append(degree_info);
+			}
+
+			// Add the last subject's degrees
+			if (!current_subject.empty()) {
+				degrees_dict[current_subject.c_str()] = subject_degrees;
+			}
+
+			return degrees_dict;
+		}
+		catch (const std::exception& e) {
+			throw std::runtime_error("Error fetching subject degrees: " + std::string(e.what()));
+		}
+	}
+
 private:
 	nanodbc::connection conn_;
 };
@@ -992,7 +1167,11 @@ PYBIND11_MODULE(my_module, m) {
 		.def("get_students", &OracleConnector::get_students)
 		.def("edit_teacher", &OracleConnector::edit_teacher)
 		.def("edit_student", &OracleConnector::edit_student)
-		.def("get_students_per_grade", &OracleConnector::get_students_per_grade);
+		.def("get_students_per_grade", &OracleConnector::get_students_per_grade)
+		.def("get_latest_subject_degrees", &OracleConnector::get_latest_subject_degrees)
+		.def("get_latest_avg_degrees", &OracleConnector::get_latest_avg_degrees)
+		.def("get_degrees", &OracleConnector::get_degrees);
+
 
 
 
